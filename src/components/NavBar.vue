@@ -1,154 +1,299 @@
 <template>
     <div class="nav">
       <div class="nav-wrapp container">
-          <div class="logo-wrapp">
-              <img src="../assets/img/logo.png" alt="Voe logo" class="logo-img">
-          </div>
+        <div class="logo-wrapp">
+          <img src="../assets/img/logo.png" alt="Voe logo" class="logo-img">
+        </div>
+        
+        <!-- Бургер-меню -->
+        <div class="burger" @click="toggleMenu" :class="{ 'active': isMenuOpen }">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        
+        <div class="nav-content" :class="{ 'active': isMenuOpen }">
           <div class="nav-links">
-              <div class="link">
-                  <li class="dropdown">
-                      <a href="#">Каталог продукции <img src="../assets/img/arrow.png" alt="" class="arrow-img"></a>
-                      <ul class="dropdown-menu">
-                          <li>Бла</li>
-                          <li>Бла</li>
-                          <li>Бла</li>
-                      </ul>
-                  </li>
+            <div class="link">
+              <div class="dropdown" @click="toggleDropdown">
+                <a href="#">Каталог продукции <img src="../assets/img/arrow.png" alt="" class="arrow-img"></a>
+                <ul class="dropdown-menu" :class="{ 'open': isDropdownOpen }">
+                  <li>Бла</li>
+                  <li>Бла</li>
+                  <li>Бла</li>
+                </ul>
               </div>
-              <div class="link">
-                <a href="">О компании</a>
-              </div>
-              <div class="link">
-                <a href="">Контакты</a>
-              </div>
+            </div>
+            <div class="link">
+              <a href="">О компании</a>
+            </div>
+            <div class="link">
+              <a href="">Контакты</a>
+            </div>
           </div>
+          
           <div class="nav-contacts">
             <img src="../assets/img/telephone.png" alt="">
             <div class="contacts-number">
-                <span>Свяжитесь с нами</span>
-                <span>+7(1234)-56-78-90</span>
-                <span>+7(1234)-56-78-90</span>
+              <span>Свяжитесь с нами</span>
+              <span>+7(1234)-56-78-90</span>
+              <span>+7(1234)-56-78-90</span>
             </div>
           </div>
+        </div>
       </div>
     </div>
   </template>
   
   <script setup>
+  import { ref } from 'vue';
   
+  const isMenuOpen = ref(false);
+  const isDropdownOpen = ref(false);
+  
+  const toggleMenu = () => {
+    isMenuOpen.value = !isMenuOpen.value;
+    if (!isMenuOpen.value) {
+      isDropdownOpen.value = false;
+    }
+  };
+  
+  const toggleDropdown = () => {
+    if (window.innerWidth <= 768) {
+      isDropdownOpen.value = !isDropdownOpen.value;
+    }
+  };
   </script>
   
   <style scoped>
+  /* Базовые стили */
   .nav {
-      background-color: var(--primary-black-color);
-      height: 114px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      z-index: 2000;
+    background-color: var(--primary-black-color);
+    height: 114px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 1000;
   }
   
   .nav-wrapp {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
   }
   
   .logo-img {
-      width: 135px;
-      height: 74px;
-      cursor: pointer;
+    width: 135px;
+    height: 74px;
+    object-fit: contain;
+  }
+  
+  .nav-content {
+    display: flex;
+    align-items: center;
+    gap: 40px;
   }
   
   .nav-links {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      max-width: 472px;
-      width: 100%;
+    display: flex;
+    gap: 30px;
   }
   
-  .link {
-      list-style: none;
-      margin-left: 30px;
+  .link a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s;
+  }
+  
+  .link a:hover {
+    color: var(--primary-orange-color);
   }
   
   .arrow-img {
     margin-left: 8px;
+    transition: transform 0.3s;
   }
-
+  
   .dropdown {
-      position: relative;
+    position: relative;
   }
   
   .dropdown-menu {
-      display: none;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      background-color: #222;
-      border: 1px solid #444;
-      min-width: 200px;
-      padding: 10px 0;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      z-index: 1000;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #222;
+    border: 1px solid #444;
+    min-width: 200px;
+    padding: 10px 0;
+    display: none;
+    z-index: 100;
+  }
+  
+  .dropdown:hover .dropdown-menu {
+    display: block;
+  }
+  
+  .dropdown-menu.open {
+    display: block;
+    position: static;
+    margin-top: 10px;
   }
   
   .dropdown-menu li {
-      padding: 10px 20px;
-      text-align: left;
-      cursor: pointer;
-      color: var(--primary-white-color);
-      transition: background-color 0.3s ease;
+    padding: 10px 20px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
   }
   
   .dropdown-menu li:hover {
-      background-color: #444;
-      color: var(--primary-orange-color);
+    background-color: #444;
+    color: var(--primary-orange-color);
   }
-  .dropdown:hover .dropdown-menu {
-      display: block;
-  }
-
-.nav-contacts {
+  
+  .nav-contacts {
     display: flex;
-    gap: 6px;
-}
-
-.nav-contacts img {
-    border: 1px solid #FF7F00;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .nav-contacts img {
+    border: 1px solid var(--primary-orange-color);
     border-radius: 5px;
     padding: 9px;
     width: 33px;
     height: 33px;
-    align-self: flex-end;
-    cursor: pointer;
-}
-
-.contacts-number {
+  }
+  
+  .contacts-number {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-}
-
-.contacts-number span {
-    color: var(--primary-white-color);
-    font-size: 9px;
-    font-weight: 400;
-    cursor: pointer;
-}
-
-.contacts-number span:not(:first-child):hover {
-    text-decoration: underline;
-}
-
-.contacts-number span:nth-child(2) {
-    color: var(--primary-orange-color);
-}
-.contacts-number span:nth-child(3) {
-    color: var(--primary-orange-color);
-}
-  </style>
+  }
   
+  .contacts-number span {
+    color: white;
+    font-size: 9px;
+  }
+  
+  .contacts-number span:nth-child(2),
+  .contacts-number span:nth-child(3) {
+    color: var(--primary-orange-color);
+    font-size: 12px;
+  }
+  
+  /* Бургер меню */
+  .burger {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 20px;
+    cursor: pointer;
+    z-index: 1001;
+  }
+  
+  .burger span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+    transition: all 0.3s;
+  }
+  
+  .burger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+  
+  .burger.active span:nth-child(2) {
+    opacity: 0;
+  }
+  
+  .burger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+  }
+  
+  /* Адаптация */
+  @media (max-width: 1024px) {
+    .nav-content {
+      gap: 20px;
+    }
+    
+    .nav-links {
+      gap: 20px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .burger {
+      display: flex;
+    }
+    
+    .nav-content {
+      position: fixed;
+      top: 114px;
+      left: 0;
+      width: 100%;
+      background-color: var(--primary-black-color);
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 20px;
+      gap: 30px;
+      transform: translateY(-150%);
+      transition: transform 0.3s;
+      z-index: 999;
+    }
+    
+    .nav-content.active {
+      transform: translateY(0);
+    }
+    
+    .nav-links {
+      flex-direction: column;
+      width: 100%;
+      gap: 15px;
+    }
+    
+    .dropdown-menu {
+      position: static;
+      display: none;
+      width: 100%;
+    }
+    
+    .nav-contacts {
+      width: 100%;
+      justify-content: flex-start;
+    }
+    
+    .contacts-number span {
+      font-size: 12px;
+    }
+    
+    .contacts-number span:nth-child(2),
+    .contacts-number span:nth-child(3) {
+      font-size: 14px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .nav {
+      height: 80px;
+    }
+    
+    .logo-img {
+      width: 100px;
+      height: 55px;
+    }
+    
+    .nav-content {
+      top: 80px;
+    }
+  }
+  </style>

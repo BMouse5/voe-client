@@ -31,7 +31,7 @@ import CarouselAbout from './components/CarouselAbout.vue'
     padding: 88px 0 100px 0;
     box-shadow: 0px 4px 4px 0px #00000040;
     position: relative;
-    z-index: 1000;
+    z-index: 999;
 }
 
 .carousel-about {
