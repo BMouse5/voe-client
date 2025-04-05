@@ -8,6 +8,8 @@
   --primary-dark-orange: #BE6105;
   --primary-light-gray: #F1EEEE;
   --primary-dark-gray: #D9D4D4;
+  --primary-asphalt-gray: #222;
+  --primary-asphalt-border: #444;
 }
 
 @font-face {

@@ -58,7 +58,7 @@ import CarouselAbout from './components/CarouselAbout.vue'
 }
 
 .why-we {
-    padding: 35px;
+    padding: 35px 10px 35px 10px;
     background-color: var(--primary-dark-orange);
 }
 
