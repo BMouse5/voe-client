@@ -333,7 +333,7 @@ onBeforeUnmount(() => {
   
   @media (max-width: 767px) {
     .product-card {
-      flex: 0 0 97.4%;
+      flex: 0 0 97.7%;
       margin: 3px 4px;
       box-shadow: 0 1px 1px #00000040;
     }
