@@ -333,9 +333,9 @@ onBeforeUnmount(() => {
   
   @media (max-width: 767px) {
     .product-card {
-      flex: 0 0 100%;
-      margin: 0 2px;
-      box-shadow: 0px 1px 1px 0px #00000040;
+      flex: 0 0 97.4%;
+      margin: 3px 4px;
+      box-shadow: 0 1px 1px #00000040;
     }
     .product-name {
       white-space: normal;
