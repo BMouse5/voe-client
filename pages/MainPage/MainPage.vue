@@ -37,7 +37,7 @@ import CarouselAbout from './components/CarouselAbout.vue'
 }
 
 .carousel-about {
-    padding: 87px 0 97px 0;
+    padding: 87px 10px 97px 10px;
     background-color: var(--primary-dark-gray);
 }
 
