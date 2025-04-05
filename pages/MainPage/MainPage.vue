@@ -64,17 +64,31 @@ import CarouselAbout from './components/CarouselAbout.vue'
 
 .why-we-title {
   display: inline-block;
-  font-size: 92px;
+  font-size: clamp(48px, 8vw, 92px); /* Адаптивный размер шрифта */
   font-weight: bold;
   color: transparent;
-  -webkit-text-stroke: 1.5px var(--primary-white-color); /* Обводка для текста */
+  -webkit-text-stroke: 1.5px var(--primary-white-color);
   text-transform: uppercase;
   font-family: 'Montserrat Bold';
+  line-height: 1.2; /* Опционально: для лучшего отображения */
 }
 
 .why-we-title-2 {
   color: var(--primary-white-color);
-  -webkit-text-stroke: 0; 
-  font-family: 'Montserrat Bold'; 
+  -webkit-text-stroke: 0;
+  font-family: 'Montserrat Bold';
+}
+
+/* Дополнительные медиа-запросы для тонкой настройки */
+@media (max-width: 768px) {
+  .why-we-title {
+    -webkit-text-stroke-width: 1px; /* Уменьшаем толщину обводки на мобильных */
+  }
+}
+
+@media (max-width: 480px) {
+  .why-we-title {
+    font-size: clamp(36px, 10vw, 48px); /* Другие значения для очень маленьких экранов */
+  }
 }
 </style>
