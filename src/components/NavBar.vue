@@ -15,14 +15,14 @@
         <div class="nav-content" :class="{ 'active': isMenuOpen }">
           <div class="nav-links">
             <div class="link">
-              <div class="dropdown" @click="toggleDropdown">
-                <a href="#">Каталог продукции <img src="../assets/img/arrow.png" alt="" class="arrow-img"></a>
-                <ul class="dropdown-menu" :class="{ 'open': isDropdownOpen }">
-                  <li>Бла</li>
-                  <li>Бла</li>
-                  <li>Бла</li>
+                <div class="dropdown" @click.stop="toggleDropdown">
+                <a href="#">Каталог продукции <img src="../assets/img/arrow.png" alt="" class="arrow-img" :class="{ 'rotated': isDropdownOpen }"></a>
+                <ul class="dropdown-menu" v-show="isDropdownOpen">
+                    <li>Бла</li>
+                    <li>Бла</li>
+                    <li>Бла</li>
                 </ul>
-              </div>
+                </div>
             </div>
             <div class="link">
               <a href="">О компании</a>
@@ -58,11 +58,24 @@
     }
   };
   
-  const toggleDropdown = () => {
-    if (window.innerWidth <= 768) {
-      isDropdownOpen.value = !isDropdownOpen.value;
+  const toggleDropdown = (event) => {
+  if (window.innerWidth <= 768) {
+    // Если меню уже открыто - закрываем его
+    if (isDropdownOpen.value) {
+      isDropdownOpen.value = false;
+    } 
+    // Если меню закрыто - открываем его
+    else {
+      // Сначала закрываем все другие открытые dropdowns
+      document.querySelectorAll('.dropdown').forEach(drop => {
+        if (drop !== event.currentTarget) {
+          drop.querySelector('.dropdown-menu')?.classList.remove('open');
+        }
+      });
+      isDropdownOpen.value = true;
     }
-  };
+  }
+};
   </script>
   
   <style scoped>
@@ -260,13 +273,38 @@
       width: 100%;
       gap: 15px;
     }
+
+    .arrow-img {
+    transition: transform 0.3s ease;
+  }
+  
+    .arrow-img.rotated {
+        transform: rotate(180deg);
+    }
     
     .dropdown-menu {
+        display: none;
       position: static;
       display: none;
       width: 100%;
     }
     
+    @media (max-width: 768px) {
+  .dropdown.active .arrow-img {
+    transform: rotate(180deg);
+  }
+  
+  .dropdown-menu.open {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; max-height: 0; }
+    to { opacity: 1; max-height: 500px; }
+  }
+}
+
     .nav-contacts {
       width: 100%;
       justify-content: flex-start;
