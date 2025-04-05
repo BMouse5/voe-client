@@ -15,7 +15,9 @@
     </div>
   </section>
   <section class="why-we">
-
+    <div class="why-we-wrapp container">
+        <h2 class="why-we-title">Почему <span class="why-we-title-2">мы</span></h2>
+    </div>
   </section>
 </template>
 
@@ -58,5 +60,21 @@ import CarouselAbout from './components/CarouselAbout.vue'
 .why-we {
     padding: 35px;
     background-color: var(--primary-dark-orange);
+}
+
+.why-we-title {
+  display: inline-block;
+  font-size: 92px;
+  font-weight: bold;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--primary-white-color); /* Обводка для текста */
+  text-transform: uppercase;
+  font-family: 'Montserrat Bold';
+}
+
+.why-we-title-2 {
+  color: var(--primary-white-color);
+  -webkit-text-stroke: 0; 
+  font-family: 'Montserrat Bold'; 
 }
 </style>

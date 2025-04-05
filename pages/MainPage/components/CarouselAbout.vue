@@ -247,6 +247,7 @@ description: 'Насос НБ-50 - буровой, поршневой, гори�
   margin-bottom: 20px;
   margin-left: 10px;
   font-weight:200;
+  font-size: 14px;
   color: var(--primary-orange-color);
 }
 

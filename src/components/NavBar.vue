@@ -15,14 +15,17 @@
         <div class="nav-content" :class="{ 'active': isMenuOpen }">
           <div class="nav-links">
             <div class="link">
-                <div class="dropdown" @click.stop="toggleDropdown">
-                <a href="#">Каталог продукции <img src="../assets/img/arrow.png" alt="" class="arrow-img" :class="{ 'rotated': isDropdownOpen }"></a>
-                <ul class="dropdown-menu" v-show="isDropdownOpen">
-                    <li>Бла</li>
-                    <li>Бла</li>
-                    <li>Бла</li>
+              <div class="dropdown" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
+                <a href="#" @click.stop="handleDropdownClick">
+                  Каталог продукции 
+                  <img src="../assets/img/arrow.png" alt="" class="arrow-img" :class="{ 'rotated': isDropdownOpen }">
+                </a>
+                <ul class="dropdown-menu" :class="{ 'open': isDropdownOpen }" @click.stop>
+                  <li>Бла</li>
+                  <li>Бла</li>
+                  <li>Бла</li>
                 </ul>
-                </div>
+              </div>
             </div>
             <div class="link">
               <a href="">О компании</a>
@@ -46,10 +49,30 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue';
+  import { ref, onMounted, onBeforeUnmount } from 'vue';
   
   const isMenuOpen = ref(false);
   const isDropdownOpen = ref(false);
+  const isMobile = ref(window.innerWidth <= 768);
+  
+  const updateIsMobile = () => {
+    isMobile.value = window.innerWidth <= 768;
+    // Если перешли в десктопный режим - закрываем dropdown
+    if (!isMobile.value) {
+      isDropdownOpen.value = false;
+    }
+  };
+  
+  onMounted(() => {
+    window.addEventListener('resize', updateIsMobile);
+    // Закрываем dropdown при клике вне его области
+    document.addEventListener('click', closeDropdownOnClickOutside);
+  });
+  
+  onBeforeUnmount(() => {
+    window.removeEventListener('resize', updateIsMobile);
+    document.removeEventListener('click', closeDropdownOnClickOutside);
+  });
   
   const toggleMenu = () => {
     isMenuOpen.value = !isMenuOpen.value;
@@ -58,24 +81,33 @@
     }
   };
   
-  const toggleDropdown = (event) => {
-  if (window.innerWidth <= 768) {
-    // Если меню уже открыто - закрываем его
-    if (isDropdownOpen.value) {
-      isDropdownOpen.value = false;
-    } 
-    // Если меню закрыто - открываем его
-    else {
-      // Сначала закрываем все другие открытые dropdowns
-      document.querySelectorAll('.dropdown').forEach(drop => {
-        if (drop !== event.currentTarget) {
-          drop.querySelector('.dropdown-menu')?.classList.remove('open');
-        }
-      });
+  const handleMouseEnter = () => {
+    if (!isMobile.value) {
       isDropdownOpen.value = true;
     }
-  }
-};
+  };
+  
+  const handleMouseLeave = () => {
+    if (!isMobile.value) {
+      isDropdownOpen.value = false;
+    }
+  };
+  
+  const handleDropdownClick = (event) => {
+    if (isMobile.value) {
+      event.preventDefault();
+      isDropdownOpen.value = !isDropdownOpen.value;
+    }
+  };
+  
+  const closeDropdownOnClickOutside = (event) => {
+    if (isMobile.value && isDropdownOpen.value) {
+      const dropdown = document.querySelector('.dropdown');
+      if (dropdown && !dropdown.contains(event.target)) {
+        isDropdownOpen.value = false;
+      }
+    }
+  };
   </script>
   
   <style scoped>
@@ -150,14 +182,12 @@
     z-index: 100;
   }
   
-  .dropdown:hover .dropdown-menu {
+  .dropdown:hover .dropdown-menu:not(.open) {
     display: block;
   }
   
   .dropdown-menu.open {
     display: block;
-    position: static;
-    margin-top: 10px;
   }
   
   .dropdown-menu li {
@@ -273,38 +303,28 @@
       width: 100%;
       gap: 15px;
     }
-
-    .arrow-img {
-    transition: transform 0.3s ease;
-  }
   
     .arrow-img.rotated {
-        transform: rotate(180deg);
+      transform: rotate(180deg);
     }
     
-    .dropdown-menu {
-        display: none;
-      position: static;
-      display: none;
-      width: 100%;
-    }
-    
-    @media (max-width: 768px) {
-  .dropdown.active .arrow-img {
-    transform: rotate(180deg);
-  }
-  
-  .dropdown-menu.open {
+    .dropdown-menu.open {
     display: block;
+    margin-top: 10px;
+    position: static;
     animation: fadeIn 0.3s ease;
   }
   
-  @keyframes fadeIn {
-    from { opacity: 0; max-height: 0; }
-    to { opacity: 1; max-height: 500px; }
+  .dropdown-menu {
+    display: none;
   }
-}
 
+    
+    @keyframes fadeIn {
+      from { opacity: 0; max-height: 0; }
+      to { opacity: 1; max-height: 500px; }
+    }
+  
     .nav-contacts {
       width: 100%;
       justify-content: flex-start;

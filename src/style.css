@@ -16,6 +16,12 @@
   font-weight: 400;
 }
 
+@font-face {
+  font-family: 'Montserrat Bold';
+  src: url('../src/assets/fonts/Montserrat-Bold.ttf');
+  font-weight: 700;
+}
+
 *, *::after, *::before {
   font-family: 'Montserrat', sans-serif;
   padding: 0;
