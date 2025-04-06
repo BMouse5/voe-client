@@ -120,31 +120,45 @@ description: 'Насос НБ-50 - буровой, поршневой, гори�
   },
   methods: {
     startDrag(e) {
-      this.isDragging = true;
-      this.startPos = this.getXPos(e);
-    },
+  this.isDragging = true;
+  this.startPos = this.getXPos(e);
+  this.dragTime = Date.now();
+  this.prevPosition = this.position;
+  
+  // Добавляем для touch-устройств
+  if (e.type === 'touchstart') {
+    e.preventDefault();
+  }
+},
     onDrag(e) {
-      if (!this.isDragging) return;
-      
-      const x = this.getXPos(e);
-      const dragDistance = x - this.startPos;
-      const newPosition = this.position + dragDistance;
-      
-      // Ограничиваем перемещение, чтобы не выходить за границы
-      if (newPosition <= 0 && newPosition >= this.maxPosition) {
-        this.position = newPosition;
-      }
-      
-      this.startPos = x;
-    },
-    endDrag() {
-      if (!this.isDragging) return;
-      this.isDragging = false;
-      
-      // Выравнивание после перетаскивания
-      const cardIndex = Math.round(-this.position / this.cardWidth);
-      this.slideTo(cardIndex);
-    },
+    if (!this.isDragging) return;
+    
+    const x = this.getXPos(e);
+    const dragDistance = (x - this.startPos) * 1.5; // Увеличиваем коэффициент чувствительности
+    const newPosition = this.position + dragDistance;
+    
+    if (newPosition <= 0 && newPosition >= this.maxPosition) {
+      this.position = newPosition;
+    }
+    
+    this.startPos = x;
+  },
+  endDrag() {
+  if (!this.isDragging) return;
+  this.isDragging = false;
+  
+  // Рассчитываем скорость свайпа
+  const velocity = (this.position - this.prevPosition) / (Date.now() - this.dragTime);
+  this.dragTime = Date.now();
+  this.prevPosition = this.position;
+  
+  // Добавляем инерцию
+  const inertiaDistance = velocity * 50; // Коэффициент инерции
+  const targetPosition = this.position + inertiaDistance;
+  
+  const cardIndex = Math.round(-targetPosition / this.cardWidth);
+  this.slideTo(cardIndex);
+},
     getXPos(e) {
       return e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
     },
@@ -181,6 +195,8 @@ description: 'Насос НБ-50 - буровой, поршневой, гори�
   width: 100%;
   cursor: grab;
   user-select: none;
+  touch-action: pan-y; /* Оптимизация для touch-устройств */
+  -webkit-overflow-scrolling: touch;
 }
 
 .slider:active {
@@ -191,6 +207,7 @@ description: 'Насос НБ-50 - буровой, поршневой, гори�
   display: flex;
   transition: transform 0.3s ease-out;
   will-change: transform;
+  
 }
 
 .card {
