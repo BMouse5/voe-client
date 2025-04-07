@@ -277,6 +277,8 @@
     
     .slide-title {
       font-size: 1.8rem;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
     }
     
     .slide-description {
