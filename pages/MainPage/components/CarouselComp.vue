@@ -109,7 +109,7 @@
   const startInterval = () => {
     interval = setInterval(() => {
       nextSlide();
-    }, 5000000000000000);
+    }, 5000);
   };
   
   const stopInterval = () => {
