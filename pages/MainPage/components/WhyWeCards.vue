@@ -15,14 +15,14 @@
         <div class="corner-arrow bottom-right"></div>
     </div>
     <div class="card">
-        <img src="../../../src/assets/img/card-1.png" alt="">
+        <img src="../../../src/assets/img/card-3.png" alt="">
         <div class="card-title">47</div>
         <div class="card-description">Квалифицированных сотрудников</div>
         <div class="corner-arrow top-left"></div>
         <div class="corner-arrow bottom-right"></div>
     </div>
     <div class="card">
-        <img src="../../../src/assets/img/card-3.png" alt="">
+        <img src="../../../src/assets/img/card-1.png" alt="">
         <div class="card-title">562 кв.м.</div>
         <div class="card-description">Производственных площадей</div>
         <div class="corner-arrow top-left"></div>

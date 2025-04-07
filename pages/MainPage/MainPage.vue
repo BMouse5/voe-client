@@ -32,6 +32,8 @@
         </div>
     </div>
   </section>
+  <ConsultationRequest></ConsultationRequest>
+  <FooterComp></FooterComp>
 </template>
 
 <script setup>
@@ -40,6 +42,8 @@ import CarouselComp from './components/CarouselComp.vue'
 import ButtonComp from '../../src/components/UI/ButtonComp.vue'
 import CarouselAbout from './components/CarouselAbout.vue'
 import WhyWeCards from './components/WhyWeCards.vue'
+import ConsultationRequest from '../../src/components/ConsultationRequest.vue'
+import FooterComp from '../../src/components/FooterComp.vue'
 </script>
 <style scoped>
 .carousel {
@@ -74,6 +78,9 @@ import WhyWeCards from './components/WhyWeCards.vue'
 .why-we {
   padding: 35px 0;
   background-color: var(--primary-dark-orange);
+  box-shadow: 0px 4px 4px 0px #00000040;
+  position: relative;
+  z-index: 2;
 }
 
 .why-we-wrapp {
