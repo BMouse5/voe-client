@@ -146,15 +146,37 @@
   }
   
   input {
-    width: 100%;
-    border: none;
-    background-color: var(--transparent-color);
-    color: var(--primary-white-color);
-    border-bottom: 1px solid var(--primary-white-color);
-    padding: 12px 0;
-    font-size: clamp(14px, 2vw, 18px);
-    transition: all 0.3s ease-in-out;
-  }
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--primary-white-color);
+  background-color: transparent;
+  color: var(--primary-white-color);
+  padding: 12px 0;
+  font-size: clamp(14px, 2vw, 18px);
+  transition: all 0.3s ease-in-out;
+  -webkit-appearance: none; /* Важно для Safari */
+  border-radius: 0; /* Убираем скругления */
+  outline: none;
+  box-shadow: none; /* Убираем тени на iOS */
+}
+
+/* Убираем дополнительные стили на iOS */
+input[type="text"],
+input[type="tel"],
+input[type="email"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Убираем подсветку при автозаполнении */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--primary-white-color);
+  -webkit-box-shadow: 0 0 0px 1000px transparent inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
   
   input::placeholder {
     font-size: clamp(14px, 2vw, 18px);
@@ -206,6 +228,16 @@
     .consent-text {
     padding-top: 20px;
     font-size: 12px;
+  }
+  input {
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    /* Оставляем только нижний бордер */
+  }
+  
+  .input-group {
+    padding: 0 15px; /* Добавляем отступы по бокам */
   }
   }
   

@@ -62,11 +62,14 @@ import FooterComp from '../../src/components/FooterComp.vue'
 .carousel-about-title {
     max-width: 552px;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .carousel-about-title h2 {
     text-transform: uppercase;
-    font-size: 42px;
+    font-size: clamp(18px, 4vw, 42px);
     border-bottom: var(--primary-orange-color) 1px solid;
     display: inline-block;
 }
