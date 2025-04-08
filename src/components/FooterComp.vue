@@ -82,7 +82,7 @@
   .footer-logo {
     max-width: 197px;
     height: auto;
-    margin-bottom: 20px;
+    display: flex;
   }
   
   .footer-logo img {

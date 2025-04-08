@@ -5,6 +5,9 @@
         <CarouselComp></CarouselComp>
     </div>
   </section>
+  <!-- <CreateProduct></CreateProduct>
+  <deleteCategory></deleteCategory>
+  <ProductList></ProductList> -->
   <section class="carousel-about">
     <div class="carousel-about-wrapp container">
         <div class="carousel-about-title">
@@ -44,6 +47,9 @@ import CarouselAbout from './components/CarouselAbout.vue'
 import WhyWeCards from './components/WhyWeCards.vue'
 import ConsultationRequest from '../../src/components/ConsultationRequest.vue'
 import FooterComp from '../../src/components/FooterComp.vue'
+import CreateProduct from '../../src/components/CreateProduct.vue'
+import deleteCategory from '../../src/components/deleteCategory.vue'
+import ProductList from '../../src/components/ProductList.vue'
 </script>
 <style scoped>
 .carousel {

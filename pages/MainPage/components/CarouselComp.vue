@@ -40,27 +40,34 @@
     </div>
   </template>
   
-  <script setup>
-  import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-  import ButtonComp from '../../../src/components/UI/ButtonComp.vue'
-  const slides = [
-    {
-      title: "Комплектующие для cитогидроциклонной установки Derrick corp.",
-      description: 'Ситогидроциклонная установка (СГУ) Derrick corp. предназначена для очистки бурового раствора от выбуренной породы при бурении нефтяных и газовых скважин. Применяется в составе циркуляционных систем буровых установок. Предприятие ООО "ИжКомплектСнаб" изготавливает аналог запасных частей, в том числе из полиуретана к ситогидроциклонным установкам Derrick corp. ИКД (аналог Derrick Corp.) выполняет функцию высоко-эффективного экономичного очистителя раствора от частиц выбуренной породы размером частиц 15-44 микрон.',
-      image: '../../../src/assets/img/derick.png'
-    },
-    {
-      title: "Комплектующие для cитогидроциклонной установки Derrick corp.",
-      description: 'Ситогидроциклонная установка (СГУ) Derrick corp. предназначена для очистки бурового раствора от выбуренной породы при бурении нефтяных и газовых скважин. Применяется в составе циркуляционных систем буровых установок. Предприятие ООО "ИжКомплектСнаб" изготавливает аналог запасных частей, в том числе из полиуретана к ситогидроциклонным установкам Derrick corp. ИКД (аналог Derrick Corp.) выполняет функцию высоко-эффективного экономичного очистителя раствора от частиц выбуренной породы размером частиц 15-44 микрон.',
-      image: '../../../src/assets/img/2.png'
-    },
-    {
-      title: "Комплектующие для cитогидроциклонной установки Derrick corp.",
-      description: 'Ситогидроциклонная установка (СГУ) Derrick corp. предназначена для очистки бурового раствора от выбуренной породы при бурении нефтяных и газовых скважин. Применяется в составе циркуляционных систем буровых установок. Предприятие ООО "ИжКомплектСнаб" изготавливает аналог запасных частей, в том числе из полиуретана к ситогидроциклонным установкам Derrick corp. ИКД (аналог Derrick Corp.) выполняет функцию высоко-эффективного экономичного очистителя раствора от частиц выбуренной породы размером частиц 15-44 микрон.',
-      image: '../../../src/assets/img/3.png'
-    },
-  ];
-  
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import ButtonComp from '../../../src/components/UI/ButtonComp.vue';
+import axios from 'axios';
+
+const products = ref([]);
+const slides = ref([]);
+const getOrders = async () => {
+  try {
+    const response = await axios.get('http://localhost:3000/api/products')
+    products.value = response.data;
+
+    slides.value = products.value.map(product => ({
+      title: product.name,
+      description: product.description,
+      image: getImage(product.image_url)
+    }))
+    console.log("Подключение успешно!", products)
+  }
+  catch(error) {
+    console.log("Ошибка получения продуктов", error);
+  }
+}
+
+const getImage = (imageUrl) => {
+  return `http://localhost:3000${imageUrl}`
+} 
+
   const currentIndex = ref(0);
   const touchStartX = ref(0);
   const touchEndX = ref(0);
@@ -78,12 +85,12 @@
   
   // Следующий слайд
   const nextSlide = () => {
-    currentIndex.value = (currentIndex.value + 1) % slides.length;
+    currentIndex.value = (currentIndex.value + 1) % slides.value.length;
   };
   
   // Предыдущий слайд
   const prevSlide = () => {
-    currentIndex.value = (currentIndex.value - 1 + slides.length) % slides.length;
+    currentIndex.value = (currentIndex.value - 1 + slides.value.length) % slides.value.length;
   };
   
   // Обработчики свайпа для мобильных устройств
@@ -118,6 +125,7 @@
   
   onMounted(() => {
     startInterval();
+    getOrders();
   });
   
   onBeforeUnmount(() => {
