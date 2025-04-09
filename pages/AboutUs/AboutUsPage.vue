@@ -4,7 +4,7 @@
     <AboutTitle></AboutTitle>
   </section>
   <section class="about-pluses">
-    <AboutPluses></AboutPluses>
+    <AboutPluses backgroundColor="var(--primary-dark-gray)"></AboutPluses>
   </section>
   <section class="garanties">
     <AboutGaranties></AboutGaranties>

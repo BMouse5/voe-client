@@ -17,6 +17,9 @@
       <div class="nav-content" :class="{ 'active': isMenuOpen }">
         <div class="nav-links">
           <div class="link">
+            <router-link to="/">Главная</router-link>
+          </div>
+          <div class="link">
             <div class="dropdown">
               <router-link to="/catalog" @click="handleDropdownClick">
                 Каталог продукции 

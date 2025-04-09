@@ -1,8 +1,13 @@
 <template>
-    <div class="about-pluses">
+    <div class="about-pluses" :style="
+    {
+      '--bg-color': props.backgroundColor,
+      '--text-color': props.textColor,
+    }"
+    >
       <div class="about-pluses-wrapp container">
-        <div class="pluses-title">
-          <h2>Почему выбирают нас</h2>
+        <div class="pluses-title" v-if="props.showTitle">
+          <h2 :style="{'--border-color': props.borderColor}">Почему выбирают нас</h2>
           <span>Многолетний опыт, качество продукции, доверие клиентов помогло стать успешной компанией</span>
         </div>
         <div class="card-container">
@@ -31,13 +36,31 @@
     </div>
   </template>
   
-  <script setup>
-  // Логика компонента
-  </script>
+<script setup>
+const props = defineProps({
+  backgroundColor: {
+    type: String,
+    default: 'var(--primary-dark-gray)'
+  },
+  textColor: {
+    type: String,
+    default: 'var(--primary-dark-color)'
+  },
+  borderColor: {
+    type: String,
+    default: "var(--primary-orange-color)"
+  },
+  showTitle: {
+    type: Boolean,
+    default: true
+  }
+})
+</script>
   
   <style scoped>
   .about-pluses {
-    background-color: var(--primary-dark-gray);
+    background-color: var(--bg-color);
+    color: var(--text-color);
   }
   
   .about-pluses-wrapp {
@@ -46,13 +69,13 @@
   
   .pluses-title {
     display: inline-block;
-    margin-bottom: 21px;
+    margin-bottom: 42px;
   }
   
   .pluses-title h2 {
     text-transform: uppercase;
     font-size: clamp(18px, 4vw, 42px);
-    border-bottom: 1px solid var(--primary-orange-color);
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
     margin-bottom: 10px;
   }
@@ -66,7 +89,6 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
-    margin-top: 40px;
   }
   
   .card {

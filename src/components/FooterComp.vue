@@ -18,9 +18,10 @@
           <div class="footer-links">
             <h4>Меню</h4>
             <div class="footer-links">
-              <a href="">Каталог продукции</a>
-              <a href="">О нас</a>
-              <a href="">Контакты</a>
+              <router-link to="/">Главная</router-link>
+              <router-link to="/catalog">Каталог продукции</router-link>
+              <router-link to="/about-us">О компании</router-link>
+              <router-link to="/contacts">Контакты</router-link>
             </div>
           </div>
           <div class="footer-links">
