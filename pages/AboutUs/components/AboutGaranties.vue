@@ -65,7 +65,7 @@
   
   .garanties-title h2 {
     border-bottom: 1px solid var(--primary-orange-color);
-    font-size: clamp(28px, 4vw, 42px);
+    font-size: clamp(18px, 4vw, 42px);
     text-transform: uppercase;
     padding-bottom: 8px;
     margin: 0;
@@ -143,7 +143,6 @@
     .garanties-title {
       padding: 30px 0;
       width: 100%;
-      text-align: center;
     }
     
     .card {
