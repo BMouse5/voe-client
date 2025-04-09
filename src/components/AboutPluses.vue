@@ -7,22 +7,22 @@
         </div>
         <div class="card-container">
           <div class="card">
-            <img src="../../../src/assets/img/card-1.png" alt="">
+            <img src="../assets/img/card-1.png" alt="">
             <div class="card-title">До 2 лет</div>
             <div class="card-description">Гарантии на выпускаемую продукцию</div>
           </div>
           <div class="card">
-            <img src="../../../src/assets/img/card-3.png" alt="">
+            <img src="../assets/img/card-3.png" alt="">
             <div class="card-title">435834</div>
             <div class="card-description">Выпущенной продукции</div>
           </div>
           <div class="card">
-            <img src="../../../src/assets/img/card-3.png" alt="">
+            <img src="../assets/img/card-3.png" alt="">
             <div class="card-title">47</div>
             <div class="card-description">Квалифицированных сотрудников</div>
           </div>
           <div class="card">
-            <img src="../../../src/assets/img/card-1.png" alt="">
+            <img src="../assets/img/card-1.png" alt="">
             <div class="card-title">562 кв.м.</div>
             <div class="card-description">Производственных площадей</div>
           </div>
