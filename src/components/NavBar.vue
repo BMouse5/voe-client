@@ -2,7 +2,9 @@
   <div class="nav">
     <div class="nav-wrapp container">
       <div class="logo-wrapp">
-        <img src="../assets/img/logo.png" alt="Voe logo" class="logo-img">
+        <router-link to="/">
+          <img src="../assets/img/logo.png" alt="Voe logo" class="logo-img">
+        </router-link>
       </div>
       
       <!-- Бургер-меню -->
@@ -16,10 +18,10 @@
         <div class="nav-links">
           <div class="link">
             <div class="dropdown">
-              <a href="#" @click="handleDropdownClick">
+              <router-link to="/catalog" @click="handleDropdownClick">
                 Каталог продукции 
                 <img src="../assets/img/arrow.png" alt="" class="arrow-img" :class="{ 'rotated': isDropdownOpen }">
-              </a>
+              </router-link>
               <ul class="dropdown-menu" :class="{ 'open': isDropdownOpen }">
                 <li>Бла</li>
                 <li>Бла</li>
@@ -28,10 +30,10 @@
             </div>
           </div>
           <div class="link">
-            <a href="">О компании</a>
+            <router-link to="/about-us">О компании</router-link>
           </div>
           <div class="link">
-            <a href="">Контакты</a>
+            <router-link to="/contacts">Контакты</router-link>
           </div>
         </div>
         
@@ -146,6 +148,10 @@ const closeDropdownOnClickOutside = (event) => {
 }
 
 .link a:hover {
+  color: var(--primary-orange-color);
+}
+
+.link a.router-link-active {
   color: var(--primary-orange-color);
 }
 
