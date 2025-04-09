@@ -2,7 +2,10 @@
   <NavBar></NavBar>
   <section class="carousel">
     <div class="carousel-wrapp container">
-        <CarouselComp></CarouselComp>
+      <CarouselComp 
+        :products="filteredParentCategoryProducts"
+        :categories="categories"
+      />
     </div>
   </section>
   <!-- <CreateProduct></CreateProduct>
@@ -10,11 +13,14 @@
   <ProductList></ProductList> -->
   <section class="carousel-about">
     <div class="carousel-about-wrapp container">
-        <div class="carousel-about-title">
-            <h2>Каталог продукции</h2>
-            <span>Широкий ассортимент насосов и запасных деталей</span>
-        </div>
-        <CarouselAbout></CarouselAbout>
+      <div class="carousel-about-title">
+        <h2>Каталог продукции</h2>
+        <span>Широкий ассортимент насосов и запасных деталей</span>
+      </div>
+      <CarouselAbout 
+        :products="products"
+        :categories="categories"
+      />
     </div>
   </section>
   <section class="why-we">
@@ -40,6 +46,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import NavBar from '../../src/components/NavBar.vue'
 import CarouselComp from './components/CarouselComp.vue'
 import ButtonComp from '../../src/components/UI/ButtonComp.vue'
@@ -50,6 +57,33 @@ import FooterComp from '../../src/components/FooterComp.vue'
 import CreateProduct from '../../src/components/CreateProduct.vue'
 import deleteCategory from '../../src/components/deleteCategory.vue'
 import ProductList from '../../src/components/ProductList.vue'
+
+const props = defineProps({
+  products: {
+    type: Array,
+    required: true,
+    default: () => []
+  },
+  categories: {
+    type: Array,
+    required: true,
+    default: () => []
+  },
+  loading: {
+    type: Boolean,
+    default: false
+  }
+});
+
+const filteredParentCategoryProducts = computed(() => {
+  const parentCategoryIds = props.categories
+    .filter(category => category.parent_id === null)
+    .map(category => category.id);
+  
+  return props.products.filter(product => 
+    parentCategoryIds.includes(product.category_id)
+  );
+});
 </script>
 <style scoped>
 .carousel {

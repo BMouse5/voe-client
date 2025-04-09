@@ -1,13 +1,42 @@
 <template>
   <div id="app">
-    <router-view></router-view>
+    <router-view 
+      :products="products" 
+      :categories="categories" 
+      :loading="loading"
+    ></router-view>
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted } from 'vue';
+import { fetchProducts, fetchCategories } from './services/api.service';
 
+const products = ref([]);
+const categories = ref([]);
+const loading = ref(true);
+
+const loadData = async () => {
+  try {
+    loading.value = true;
+    const [productsData, categoriesData] = await Promise.all([
+      fetchProducts(),
+      fetchCategories()
+    ]);
+    products.value = productsData;
+    categories.value = categoriesData;
+  } catch (error) {
+    console.error('Ошибка загрузки данных:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(() => {
+  loadData();
+});
 </script>
 
 <style>
-
+/* Глобальные стили */
 </style>

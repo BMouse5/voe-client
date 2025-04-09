@@ -22,23 +22,23 @@
           @mouseenter="hoverIndex = index"
           @mouseleave="hoverIndex = null"
         >
-        <div class="card-cont">
-          <div class="card-image">
-            <img :src="card.image" :alt="card.title">
-          </div>
-          <div class="card-text">{{ card.name }}</div>
-          
-          <div 
-            class="card-overlay" 
-            :class="{ 'active': hoverIndex === index }"
-          >
-            <div class="overlay-content">
-              <div class="overlay-text">{{ card.description }}</div>
-              <div class="overlay-button">
-                <ButtonComp variant="transparent">Подробнее</ButtonComp>
+          <div class="card-cont">
+            <div class="card-image">
+              <img :src="card.image" :alt="card.title">
+            </div>
+            <div class="card-text">{{ card.name }}</div>
+            
+            <div 
+              class="card-overlay" 
+              :class="{ 'active': hoverIndex === index }"
+            >
+              <div class="overlay-content">
+                <div class="overlay-text">{{ card.description }}</div>
+                <div class="overlay-button">
+                  <ButtonComp variant="transparent">Подробнее</ButtonComp>
+                </div>
               </div>
             </div>
-          </div>
           </div>
         </div>
       </div>
@@ -46,144 +46,143 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import ButtonComp from '../../../src/components/UI/ButtonComp.vue'
-export default {
-  name: 'CardSlider',
-  data() {
-    return {
-      position: 0,
-      startPos: 0,
-      isDragging: false,
-      currentIndex: 0,
-      hoverIndex: null,
-      cards: [
-    {
-      name: 'Товар 1',
-      image: '../../../src/assets/img/2.png',
-      description: 'Насос НБ-50 - буровой, поршневой, горизонтальный, двухцилиндровый, двустороннего действия, приводной со встроенным зубчатым редуктором.'
-    },
-    {
-      name: 'Товар 2',
-      image: '../../../src/assets/img/2.png',
-      description: 'Насос НБ-50 - буровой, поршневой, горизонтальный, двухцилиндровый, двустороннего действия, приводной со встроенным зубчатым редуктором.'
-    },
-    {
-      name: 'Товар 3',
-      image: '../../../src/assets/img/2.png',
-description: 'Насос НБ-50 - буровой, поршневой, горизонтальный, двухцилиндровый, двустороннего действия, приводной со встроенным зубчатым редуктором.'
-    },
-    {
-      name: 'Товар 4',
-      image: '../../../src/assets/img/2.png',
-description: 'Насос НБ-50 - буровой, поршневой, горизонтальный, двухцилиндровый, двустороннего действия, приводной со встроенным зубчатым редуктором.'
-    },
-    {
-      name: 'Товар 5',
-      image: '../../../src/assets/img/2.png',
-description: 'Насос НБ-50 - буровой, поршневой, горизонтальный, двухцилиндровый, двустороннего действия, приводной со встроенным зубчатым редуктором.'
-    },
-    {
-      name: 'Товар 6',
-      image: '../../../src/assets/img/2.png',
-description: 'Насос НБ-50 - буровой, поршневой, горизонтальный, двухцилиндровый, двустороннего действия, приводной со встроенным зубчатым редуктором.'
-    },
-    {
-      name: 'Товар 7',
-      image: '../../../src/assets/img/2.png',
-description: 'Насос НБ-50 - буровой, поршневой, горизонтальный, двухцилиндровый, двустороннего действия, приводной со встроенным зубчатым редуктором.'
-    },
-    {
-      name: 'Товар 8',
-      image: '../../../src/assets/img/2.png',
-description: 'Насос НБ-50 - буровой, поршневой, горизонтальный, двухцилиндровый, двустороннего действия, приводной со встроенным зубчатым редуктором.'
-    }
-  ]
-    }
+
+const props = defineProps({
+  products: {
+    type: Array,
+    required: true,
+    default: () => []
   },
-  components: {
-    ButtonComp
-  },
-  computed: {
-    cardWidth() {
-      return this.$refs.slider ? this.$refs.slider.offsetWidth / this.visibleCards : 0;
-    },
-    maxPosition() {
-      return -((this.cards.length - this.visibleCards) * this.cardWidth);
-    },
-    visibleCards() {
-      if (window.innerWidth >= 1200) return 4;
-      if (window.innerWidth >= 768) return 3;
-      if (window.innerWidth >= 480) return 2;
-      return 1;
-    }
-  },
-  methods: {
-    startDrag(e) {
-  this.isDragging = true;
-  this.startPos = this.getXPos(e);
-  this.dragTime = Date.now();
-  this.prevPosition = this.position;
-  
-  // Добавляем для touch-устройств
-  if (e.type === 'touchstart') {
-    e.preventDefault();
+  categories: {
+    type: Array,
+    required: true,
+    default: () => []
   }
-},
-    onDrag(e) {
-    if (!this.isDragging) return;
-    
-    const x = this.getXPos(e);
-    const dragDistance = (x - this.startPos) * 1.5; // Увеличиваем коэффициент чувствительности
-    const newPosition = this.position + dragDistance;
-    
-    if (newPosition <= 0 && newPosition >= this.maxPosition) {
-      this.position = newPosition;
-    }
-    
-    this.startPos = x;
-  },
-  endDrag() {
-  if (!this.isDragging) return;
-  this.isDragging = false;
+})
+
+// Реактивные переменные для слайдера
+const position = ref(0)
+const startPos = ref(0)
+const isDragging = ref(false)
+const currentIndex = ref(0)
+const hoverIndex = ref(null)
+const slider = ref(null)
+const dragTime = ref(0)
+const prevPosition = ref(0)
+
+const getImage = (imageUrl) => {
+  return `http://localhost:3000${imageUrl}`
+}
+
+// Вычисляемые свойства
+const cardWidth = computed(() => {
+  return slider.value ? slider.value.offsetWidth / visibleCards.value : 0
+})
+
+const maxPosition = computed(() => {
+  return -((cards.value.length - visibleCards.value) * cardWidth.value)
+})
+
+const visibleCards = computed(() => {
+  if (window.innerWidth >= 1200) return 4
+  if (window.innerWidth >= 768) return 3
+  if (window.innerWidth >= 480) return 2
+  return 1
+})
+
+const cards = computed(() => {
+  // Сначала находим ID всех подкатегорий (у которых есть parent_id)
+  const subcategoryIds = props.categories
+    .filter(category => category.parent_id !== null)
+    .map(category => category.id)
   
-  // Рассчитываем скорость свайпа
-  const velocity = (this.position - this.prevPosition) / (Date.now() - this.dragTime);
-  this.dragTime = Date.now();
-  this.prevPosition = this.position;
+  // Затем фильтруем продукты, оставляя только те, чья category_id есть в subcategoryIds
+  return props.products
+    .filter(product => subcategoryIds.includes(product.category_id))
+    .map(product => ({
+      title: product.name,
+      name: product.name,
+      description: product.description,
+      image: getImage(product.image_url)
+    }))
+})
+
+// Методы слайдера
+const startDrag = (e) => {
+  isDragging.value = true
+  startPos.value = getXPos(e)
+  dragTime.value = Date.now()
+  prevPosition.value = position.value
   
-  // Добавляем инерцию
-  const inertiaDistance = velocity * 50; // Коэффициент инерции
-  const targetPosition = this.position + inertiaDistance;
-  
-  const cardIndex = Math.round(-targetPosition / this.cardWidth);
-  this.slideTo(cardIndex);
-},
-    getXPos(e) {
-      return e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-    },
-    slideTo(index) {
-      // Ограничиваем индекс, чтобы не выходить за границы
-      index = Math.max(0, Math.min(index, this.cards.length - this.visibleCards));
-      
-      this.currentIndex = index;
-      this.position = -index * this.cardWidth;
-    }
-  },
-  mounted() {
-    window.addEventListener('resize', () => {
-      this.slideTo(this.currentIndex);
-    });
+  if (e.type === 'touchstart') {
+    e.preventDefault()
   }
 }
+
+const onDrag = (e) => {
+  if (!isDragging.value) return
+  
+  const x = getXPos(e)
+  const dragDistance = (x - startPos.value) * 1.5
+  const newPosition = position.value + dragDistance
+  
+  if (newPosition <= 0 && newPosition >= maxPosition.value) {
+    position.value = newPosition
+  }
+  
+  startPos.value = x
+}
+
+const endDrag = () => {
+  if (!isDragging.value) return
+  isDragging.value = false
+  
+  const velocity = (position.value - prevPosition.value) / (Date.now() - dragTime.value)
+  dragTime.value = Date.now()
+  prevPosition.value = position.value
+  
+  const inertiaDistance = velocity * 50
+  const targetPosition = position.value + inertiaDistance
+  
+  const cardIndex = Math.round(-targetPosition / cardWidth.value)
+  slideTo(cardIndex)
+}
+
+const getXPos = (e) => {
+  return e.type.includes('touch') ? e.touches[0].clientX : e.clientX
+}
+
+const slideTo = (index) => {
+  index = Math.max(0, Math.min(index, cards.value.length - visibleCards.value))
+  currentIndex.value = index
+  position.value = -index * cardWidth.value
+}
+
+const handleResize = () => {
+  slideTo(currentIndex.value)
+}
+
+// Хуки жизненного цикла
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <style scoped>
+/* Стили остаются без изменений */
 .card-cont {
   background-color: var(--primary-white-color);
   border-radius: 8px;
   padding: 20px 10px;
   box-shadow: 0px 4px 4px 0px #00000040;
+  height: 100%;
 }
 .slider-container {
   width: 100%;
@@ -195,7 +194,7 @@ description: 'Насос НБ-50 - буровой, поршневой, гори�
   width: 100%;
   cursor: grab;
   user-select: none;
-  touch-action: pan-y; /* Оптимизация для touch-устройств */
+  touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -207,7 +206,6 @@ description: 'Насос НБ-50 - буровой, поршневой, гори�
   display: flex;
   transition: transform 0.3s ease-out;
   will-change: transform;
-  
 }
 
 .card {
@@ -241,7 +239,7 @@ description: 'Насос НБ-50 - буровой, поршневой, гори�
   overflow: hidden;
   border-radius: 8px;
   height: 0;
-  padding-bottom: 66.66%; /* Соотношение 3:2 */
+  padding-bottom: 66.66%;
 }
 
 .card-image img {
@@ -306,5 +304,4 @@ description: 'Насос НБ-50 - буровой, поршневой, гори�
   bottom: 6%;
   left: 6%;
 }
-
 </style>
