@@ -82,6 +82,7 @@ const resetCategory = () => {
   width: 100%;
   padding: 0 15px;
   box-sizing: border-box;
+  min-height: 100vh;
 }
 
 .categories-wrapp {
