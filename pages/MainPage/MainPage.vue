@@ -1,5 +1,5 @@
 <template>
-  <NavBar></NavBar>
+  <NavBar :parentCategories="parentCategories"></NavBar>
   <section class="carousel">
     <div class="carousel-wrapp container">
       <CarouselComp 
@@ -8,9 +8,9 @@
       />
     </div>
   </section>
-  <!-- <CreateProduct></CreateProduct>
+  <CreateProduct></CreateProduct>
   <deleteCategory></deleteCategory>
-  <ProductList></ProductList> -->
+  <ProductList></ProductList>
   <section class="carousel-about">
     <div class="carousel-about-wrapp container">
       <div class="carousel-about-title">
@@ -42,7 +42,7 @@
     </div>
   </section>
   <ConsultationRequest></ConsultationRequest>
-  <FooterComp></FooterComp>
+  <FooterComp :parentCategories="parentCategories"></FooterComp>
 </template>
 
 <script setup>
@@ -72,6 +72,10 @@ const props = defineProps({
   loading: {
     type: Boolean,
     default: false
+  },
+  parentCategories: {
+    type: Array,
+    default: () => []
   }
 });
 

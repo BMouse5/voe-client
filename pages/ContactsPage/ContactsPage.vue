@@ -1,5 +1,5 @@
 <template>
-  <NavBar></NavBar>
+  <NavBar :parentCategories="parentCategories"></NavBar>
   <section class="title">
     <ContactTitle></ContactTitle>
   </section>
@@ -33,7 +33,7 @@
   <section class="contacts-consultation">
     <ConsultationRequest></ConsultationRequest>
   </section>
-  <FooterComp></FooterComp>
+  <FooterComp :parentCategories="parentCategories"></FooterComp>
 </template>
 
 <script setup>
@@ -43,6 +43,13 @@ import AboutPluses from '../../src/components/AboutPluses.vue'
 import ConsultationRequest from '../../src/components/ConsultationRequest.vue'
 import FooterComp from '../../src/components/FooterComp.vue'
 
+
+const props = defineProps({
+  parentCategories: {
+    type: Array,
+    default: () => []
+  }
+})
 </script>
 
 <style scoped>

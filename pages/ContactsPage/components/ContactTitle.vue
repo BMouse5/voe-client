@@ -127,6 +127,7 @@
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 40px;
+    align-items: center;
   }
   
   .contact-info {
@@ -140,7 +141,7 @@
   .info-item {
     display: flex;
     gap: 20px;
-    align-items: flex-start;
+    align-items: center;
   }
   
   .item-img {
@@ -255,8 +256,7 @@
     }
     
     .contact-wrapp {
-      flex-direction: column;
-      gap: 40px;
+
     }
     
     .contact-info {
@@ -295,8 +295,7 @@
     }
     
     .info-item {
-      flex-direction: column;
-      gap: 10px;
+
     }
     
     .item-text {

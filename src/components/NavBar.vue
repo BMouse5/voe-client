@@ -26,9 +26,9 @@
                 <img src="../assets/img/arrow.png" alt="" class="arrow-img" :class="{ 'rotated': isDropdownOpen }">
               </router-link>
               <ul class="dropdown-menu" :class="{ 'open': isDropdownOpen }">
-                <li>Бла</li>
-                <li>Бла</li>
-                <li>Бла</li>
+                <li v-for="category in parentCategories" :key="category.id">
+                  {{ category.name }}
+                </li>
               </ul>
             </div>
           </div>
@@ -59,6 +59,14 @@ import { ref, onMounted, onBeforeUnmount } from 'vue';
 const isMenuOpen = ref(false);
 const isDropdownOpen = ref(false);
 const isMobile = ref(window.innerWidth <= 768);
+
+const props = defineProps({
+  parentCategories: {
+    type: Array,
+    required: true,
+    default: () => []
+  }
+})
 
 const updateIsMobile = () => {
   isMobile.value = window.innerWidth <= 768;

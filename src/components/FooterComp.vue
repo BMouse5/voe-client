@@ -8,11 +8,7 @@
           <div class="footer-links footer-card">
             <h4>Каталог</h4>
             <div class="footer-links">
-              <a href="">Центробежные шламовые насосы</a>
-              <a href="">Центробежные шламовые насосы</a>
-              <a href="">Центробежные шламовые насосы</a>
-              <a href="">Центробежные шламовые насосы</a>
-              <a href="">Центробежные шламовые насосы</a>
+              <router-link v-for="category in parentCategories" :key="category.id">{{ category.name }}</router-link>
             </div>
           </div>
           <div class="footer-links">
@@ -53,11 +49,15 @@
     </div>
   </template>
   
-  <script>
-  export default {
-    name: 'FooterComponent'
+<script setup>
+
+const props = defineProps({
+  parentCategories: {
+    type: Array,
+    default: () => []
   }
-  </script>
+})
+</script>
   
   <style scoped>
   .footer {
