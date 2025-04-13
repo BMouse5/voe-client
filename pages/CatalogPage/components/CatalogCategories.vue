@@ -111,6 +111,9 @@ const toggleMobileMenu = () => {
   };
   
   const selectChildCategory = (childId, parentId) => {
+    if (window.innerWidth <= 768) {
+  mobileMenuOpen.value = false;
+}
     // При выборе подкатегории оставляем родительскую категорию открытой
     selectedParentId.value = parentId;
     isOpen.value[parentId] = true;
