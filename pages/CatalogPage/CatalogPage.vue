@@ -18,13 +18,52 @@
       </div>
     </div>
   </section>
+  <FooterComp :parentCategories="parentCategories"></FooterComp>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import NavBar from '../../src/components/NavBar.vue'
-import CatalogCategories from './components/CatalogCategories.vue'
-import CatalogProducts from './components/CatalogProducts.vue'
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import NavBar from '../../src/components/NavBar.vue';
+import FooterComp from '../../src/components/FooterComp.vue';
+import CatalogCategories from './components/CatalogCategories.vue';
+import CatalogProducts from './components/CatalogProducts.vue';
+
+const route = useRoute();
+const selectedCategoryId = ref(null);
+
+// Обработка query-параметра при загрузке
+onMounted(() => {
+  if (route.query.category) {
+    selectedCategoryId.value = parseInt(route.query.category);
+  }
+});
+
+// Отслеживаем изменения route
+watch(
+  () => route.query.category,
+  (newCategoryId) => {
+    if (newCategoryId) {
+      selectedCategoryId.value = parseInt(newCategoryId);
+    } else {
+      selectedCategoryId.value = null;
+    }
+  }
+);
+
+const filteredProducts = computed(() => {
+  if (!selectedCategoryId.value) return props.products;
+  
+  const childCategories = props.categories.filter(
+    cat => cat.parent_id === selectedCategoryId.value
+  ).map(cat => cat.id);
+  
+  const categoriesToFilter = [selectedCategoryId.value, ...childCategories];
+  
+  return props.products.filter(
+    product => categoriesToFilter.includes(product.category_id)
+  );
+});
 
 const props = defineProps({
   parentCategories: {
@@ -39,34 +78,7 @@ const props = defineProps({
     type: Array,
     default: () => []
   }
-})
-
-const selectedCategoryId = ref(null)
-
-const filteredProducts = computed(() => {
-  // Если категория не выбрана - возвращаем все товары
-  if (!selectedCategoryId.value) return props.products
-  
-  // Получаем все дочерние категории для выбранной
-  const childCategories = props.categories.filter(
-    cat => cat.parent_id === selectedCategoryId.value
-  ).map(cat => cat.id)
-  
-  // Добавляем саму выбранную категорию
-  const categoriesToFilter = [selectedCategoryId.value, ...childCategories]
-  
-  return props.products.filter(
-    product => categoriesToFilter.includes(product.category_id)
-  )
-})
-
-const handleCategorySelect = (categoryId) => {
-  selectedCategoryId.value = categoryId
-}
-
-const resetCategory = () => {
-  selectedCategoryId.value = null
-}
+});
 </script>
 
 <style scoped>

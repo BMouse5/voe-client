@@ -2,7 +2,8 @@
   <div class="consultation">
     <div class="consultation-cont container">
       <div class="consultation-title">
-        <h3>Оставьте заявку на консультацию</h3>
+        
+        <h3><slot></slot></h3>
       </div>
       <div class="consultation-form">
           <div class="form-wrapper">

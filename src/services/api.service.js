@@ -22,3 +22,13 @@ export const fetchCategories = async () => {
         console.log("Ошибка получения категорий", error)
     }
 };
+
+export const fetchProductById = async (id) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/products/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при получении продукта:', error);
+    throw error;
+  }
+};

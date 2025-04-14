@@ -31,7 +31,7 @@
     </AboutPluses>
   </section>
   <section class="contacts-consultation">
-    <ConsultationRequest></ConsultationRequest>
+    <ConsultationRequest>Оставьте заявку на консультацию</ConsultationRequest>
   </section>
   <FooterComp :parentCategories="parentCategories"></FooterComp>
 </template>

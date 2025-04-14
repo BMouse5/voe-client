@@ -41,7 +41,7 @@
         </div>
     </div>
   </section>
-  <ConsultationRequest></ConsultationRequest>
+  <ConsultationRequest>Оставьте заявку на консультацию</ConsultationRequest>
   <FooterComp :parentCategories="parentCategories"></FooterComp>
 </template>
 

@@ -4,7 +4,7 @@
       {{ selectedCategory ? 'Товары категории' : 'Все товары' }}
     </h4>
       <div class="product-list">
-        <div class="card" v-for="product in products" :key="product.id">
+        <div class="card" v-for="product in products" :key="product.id" @click="goToProduct(product.id)">
           <div class="card-body">
             <img 
               v-if="product.image_url" 
@@ -25,6 +25,9 @@
   
   <script setup>
   import { ref } from 'vue'
+  import { useRouter } from 'vue-router';
+
+const router = useRouter();
   const props = defineProps({
     products: {
       type: Array,
@@ -39,6 +42,13 @@
   const getImage = (imageUrl) => {
     return `http://localhost:3000${imageUrl}`
   }
+
+  const goToProduct = (productId) => {
+    router.push({ 
+        name: 'product', 
+        params: { id: productId } 
+    });
+};
   </script>
   
   <style scoped>

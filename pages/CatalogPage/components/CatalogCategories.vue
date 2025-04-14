@@ -64,74 +64,137 @@
       </div>
     </div>
   </template>
-  <script setup>
-  import { ref } from 'vue';
-  
-  const props = defineProps({
-    categories: {
-      type: Array,
-      default: () => []
-    },
-    parentCategories: {
-      type: Array,
-      default: () => []
-    }
-  });
-  
+<script setup>
+import { ref, watch, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+
+const router = useRouter();
+const route = useRoute();
+const props = defineProps({
+  categories: {
+    type: Array,
+    default: () => []
+  },
+  parentCategories: {
+    type: Array,
+    default: () => []
+  }
+});
+
 const mobileMenuOpen = ref(false);
+const isOpen = ref({});
+const selectedParentId = ref(null);
+
+// Закрываем все категории перед открытием новой
+const closeAllCategories = () => {
+  Object.keys(isOpen.value).forEach(key => {
+    isOpen.value[key] = false;
+  });
+};
 
 const toggleMobileMenu = () => {
   mobileMenuOpen.value = !mobileMenuOpen.value;
 };
 
-  const emit = defineEmits(['select-category', 'reset-category']);
+const emit = defineEmits(['select-category', 'reset-category']);
+
+const findParentCategory = (childId) => {
+  const childCategory = props.categories.find(cat => cat.id === childId);
+  return childCategory ? childCategory.parent_id : null;
+};
+
+onMounted(() => {
+  if (route.query.category) {
+    const categoryId = parseInt(route.query.category);
+    handleInitialCategory(categoryId);
+  }
+});
+
+const handleInitialCategory = (categoryId) => {
+  // Закрываем все категории перед обработкой новой
+  closeAllCategories();
   
-  const isOpen = ref({});
-  const selectedParentId = ref(null);
+  const isParent = props.parentCategories.some(cat => cat.id === categoryId);
   
-  const toggleParentCategory = (id) => {
-    // Если кликаем по уже открытой родительской категории
-    if (selectedParentId.value === id) {
-      isOpen.value[id] = !isOpen.value[id];
-      if (!isOpen.value[id]) {
+  if (isParent) {
+    selectedParentId.value = categoryId;
+    isOpen.value[categoryId] = true;
+    emit('select-category', categoryId);
+  } else {
+    const parentId = findParentCategory(categoryId);
+    if (parentId) {
+      selectedParentId.value = parentId;
+      isOpen.value[parentId] = true;
+      emit('select-category', categoryId);
+    }
+  }
+};
+
+watch(
+  () => route.query.category,
+  (newCategoryId, oldCategoryId) => {
+    // Закрываем все категории только если параметр изменился
+    if (newCategoryId !== oldCategoryId) {
+      if (newCategoryId) {
+        const categoryId = parseInt(newCategoryId);
+        handleInitialCategory(categoryId);
+      } else {
         resetCategory();
       }
-      return;
     }
-    
-    // Закрываем предыдущую категорию
-    if (selectedParentId.value) {
-      isOpen.value[selectedParentId.value] = false;
+  },
+  { immediate: true }
+);
+
+const toggleParentCategory = (id) => {
+  router.push({ 
+    name: 'catalog', 
+    query: { category: id } 
+  });
+  
+  if (selectedParentId.value === id) {
+    isOpen.value[id] = !isOpen.value[id];
+    if (!isOpen.value[id]) {
+      resetCategory();
     }
-    
-    // Открываем новую
-    selectedParentId.value = id;
-    isOpen.value[id] = true;
-    emit('select-category', id);
-  };
+    return;
+  }
   
-  const selectChildCategory = (childId, parentId) => {
-    if (window.innerWidth <= 768) {
-  mobileMenuOpen.value = false;
-}
-    // При выборе подкатегории оставляем родительскую категорию открытой
-    selectedParentId.value = parentId;
-    isOpen.value[parentId] = true;
-    emit('select-category', childId);
-  };
+  closeAllCategories();
   
-  const resetCategory = () => {
-    selectedParentId.value = null;
-    Object.keys(isOpen.value).forEach(key => {
-      isOpen.value[key] = false;
-    });
-    emit('reset-category');
-  };
+  selectedParentId.value = id;
+  isOpen.value[id] = true;
+  emit('select-category', id);
+};
+
+const selectChildCategory = (childId, parentId) => {
+  router.push({ 
+    name: 'catalog', 
+    query: { category: childId } 
+  });
   
-  const getChildren = (parentId) => {
-    return props.categories.filter(cat => cat.parent_id === parentId);
-  };
-  </script>
+  if (window.innerWidth <= 768) {
+    mobileMenuOpen.value = false;
+  }
+  
+  closeAllCategories();
+  
+  selectedParentId.value = parentId;
+  isOpen.value[parentId] = true;
+  emit('select-category', childId);
+};
+
+const resetCategory = () => {
+  router.push({ name: 'catalog' });
+  selectedParentId.value = null;
+  closeAllCategories();
+  emit('reset-category');
+};
+
+const getChildren = (parentId) => {
+  return props.categories.filter(cat => cat.parent_id === parentId);
+};
+</script>
 
   <style scoped>
   h4 {

@@ -8,7 +8,14 @@
           <div class="footer-links footer-card">
             <h4>Каталог</h4>
             <div class="footer-links">
-              <router-link v-for="category in parentCategories" :key="category.id">{{ category.name }}</router-link>
+              <router-link
+                v-for="category in parentCategories" 
+                :key="category.id"
+                :to="{ name: 'catalog', query: { category: category.id } }"
+                @click="selectCategory(category.id)"
+               >
+               {{ category.name }}
+              </router-link>
             </div>
           </div>
           <div class="footer-links">
@@ -49,15 +56,25 @@
     </div>
   </template>
   
-<script setup>
-
-const props = defineProps({
-  parentCategories: {
-    type: Array,
-    default: () => []
-  }
-})
-</script>
+  <script setup>
+  import { useRouter } from 'vue-router';
+  
+  const router = useRouter();
+  const props = defineProps({
+    parentCategories: {
+      type: Array,
+      default: () => []
+    }
+  });
+  
+  const selectCategory = (categoryId) => {
+    // Просто перенаправляем с query-параметром
+    router.push({ 
+      name: 'catalog', 
+      query: { category: categoryId } 
+    });
+  };
+  </script>
   
   <style scoped>
   .footer {

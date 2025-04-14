@@ -26,7 +26,11 @@
                 <img src="../assets/img/arrow.png" alt="" class="arrow-img" :class="{ 'rotated': isDropdownOpen }">
               </router-link>
               <ul class="dropdown-menu" :class="{ 'open': isDropdownOpen }">
-                <li v-for="category in parentCategories" :key="category.id">
+                <li 
+                  v-for="category in parentCategories" 
+                  :key="category.id"
+                  @click="navigateToCategory(category.id)"
+                >
                   {{ category.name }}
                 </li>
               </ul>
@@ -55,6 +59,9 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const isMenuOpen = ref(false);
 const isDropdownOpen = ref(false);
@@ -67,6 +74,20 @@ const props = defineProps({
     default: () => []
   }
 })
+
+const navigateToCategory = (categoryId) => {
+  // Закрываем меню на мобильных устройствах
+  if (isMobile.value) {
+    isMenuOpen.value = false;
+    isDropdownOpen.value = false;
+  }
+  
+  // Переходим в каталог с query-параметром
+  router.push({ 
+    name: 'catalog', 
+    query: { category: categoryId } 
+  });
+};
 
 const updateIsMobile = () => {
   isMobile.value = window.innerWidth <= 768;
