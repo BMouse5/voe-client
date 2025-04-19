@@ -66,6 +66,13 @@
       default: () => []
     }
   });
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
   
   const selectCategory = (categoryId) => {
     // Просто перенаправляем с query-параметром
@@ -104,8 +111,9 @@
   }
   
   .footer-logo img {
+    max-width: 197px;
+    height: 150px;
     width: 100%;
-    height: auto;
     object-fit: contain;
   }
   

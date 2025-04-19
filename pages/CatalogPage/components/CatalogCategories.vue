@@ -27,7 +27,7 @@
           :key="parent.id"
           class="categories-item"
         >
-          <div class="accordion-header" @click="toggleParentCategory(parent.id)">
+          <div class="accordion-header" :class="{ open: isOpen[parent.id] }" @click="toggleParentCategory(parent.id)">
             <span :class="{ open: isOpen[parent.id] }">{{ parent.name }}</span>
             <svg
               class="arrow-icon"
@@ -221,24 +221,26 @@ const getChildren = (parentId) => {
     user-select: none;
     font-weight: 500;
     transition: all 0.3s ease;
+    border-bottom: 1px solid var(--black-opacity-color);
+  }
+
+  .accordion-header.open {
+    border-bottom: 1px solid var(--primary-orange-color);
   }
 
   .accordion-header span {
     font-size: 17px;
     font-weight: 600;
-    border-bottom: 1px solid var(--black-opacity-color);
     transition: all 0.3s ease;
     padding-bottom: 5px;
 }
 
 .accordion-header span:hover {
-    border-bottom: 1px solid var(--primary-orange-color);
     color: var(--primary-orange-color);
 }
 
   .accordion-header span.open {
     color: var(--primary-orange-color);
-    border-bottom: 1px solid var(--primary-orange-color)
   }
   
   .arrow-icon {

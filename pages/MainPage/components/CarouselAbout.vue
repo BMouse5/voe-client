@@ -3,6 +3,7 @@
     <div 
       class="slider"
       ref="slider"
+      v-if="props.products && props.products.length > 0"
       @mousedown="startDrag"
       @touchstart="startDrag"
       @mousemove="onDrag"
@@ -42,6 +43,9 @@
           </div>
         </div>
       </div>
+    </div>
+    <div v-else>
+      <p class="error-message">К сожалению, на данный момент товары отсутствуют. Попробуйте позже!</p>
     </div>
   </div>
 </template>

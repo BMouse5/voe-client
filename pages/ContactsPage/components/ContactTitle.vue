@@ -1,5 +1,9 @@
 <template>
     <div class="contact-title">
+        <!-- Toast уведомление -->
+        <div v-if="showToast" class="toast" :class="{ success: toastSuccess }">
+          {{ toastMessage }}
+        </div>
       <div class="container contact-wrapp">
         <div class="contact-info">
           <!-- Контактные данные -->
@@ -30,7 +34,6 @@
                 type="tel"
                 placeholder="Телефон"
                 v-model="form.phone"
-                v-mask="'+7(###)-###-####'"
               >
             </div>
             <div class="input-group">
@@ -43,10 +46,13 @@
               >
             </div>
             <div class="input-group">
-              <textarea placeholder="Комментарий" v-model="form.comment"></textarea>
+              <textarea placeholder="Комментарий" v-model="form.message"></textarea>
             </div>
             <div class="button-group">
-              <ButtonComp>Отправить</ButtonComp>
+              <ButtonComp class="submit-btn" :disabled="isLoading">
+                <span v-if="!isLoading">Отправить</span>
+                <span v-else class="loader"></span>
+              </ButtonComp>
               <span class="consent-text">
                 Оставляя заявку вы соглашаетесь с политикой обработки 
                 <a href="#">персональных данных</a>
@@ -61,7 +67,13 @@
   <script setup>
   import { ref } from 'vue';
   import ButtonComp from '../../../src/components/UI/ButtonComp.vue';
-  
+import axios from 'axios';
+
+const isLoading = ref(false)
+const showToast = ref(false)
+const toastMessage = ref('')
+const toastSuccess = ref(false)
+
   const contactItems = [
     {
       icon: '/src/assets/img/position.svg',
@@ -89,16 +101,99 @@
     name: '',
     phone: '',
     email: '',
-    comment: ''
+    message: ''
   });
   
-  const handleSubmit = () => {
-    // Обработка отправки формы
-    console.log('Форма отправлена:', form.value);
+  const showNotification = (message, success) => {
+  toastMessage.value = message
+  toastSuccess.value = success
+  showToast.value = true
+  setTimeout(() => {
+    showToast.value = false
+  }, 2000)
+}
+
+  const handleSubmit = async () => {
+    try {
+      isLoading.value = true
+      const response = await axios.post(
+        'http://localhost:3000/api/consultations',
+         form.value
+      );
+      if(response) {
+        form.value = {
+        name: '',
+        email: '',
+        phone: '',
+        message: ''
+      };
+        showNotification('Заявка успешно отправлена!', true)
+      }
+    }
+    catch(error){
+      console.log("Ошибка отправки заявки", error);
+      showNotification('Ошибка при отправке заявки', false)
+    }
+    finally {
+      isLoading.value = false
+    }
   };
   </script>
   
   <style scoped>
+
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  border-radius: 4px;
+  color: white;
+  font-weight: 500;
+  z-index: 1000;
+  animation: slideIn 0.3s, fadeOut 0.5s 1.5s forwards;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.toast.success {
+  background-color: #4caf50;
+}
+
+.toast:not(.success) {
+  background-color: #f44336;
+}
+
+@keyframes slideIn {
+  from { top: -50px; opacity: 0; }
+  to { top: 20px; opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Стили для индикатора загрузки */
+.loader {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
   .contact-title {
     position: relative;
     min-height: 300px;
@@ -190,7 +285,8 @@
     padding: 15px 20px;
     background-color: var(--input-bg);
     transition: all 0.2s ease-in-out;
-    color: var(--primary-white-color);
+    color: var(--primary-black-color);
+    font-size: 16px;
   }
   
   input::placeholder, 

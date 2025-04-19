@@ -1,10 +1,22 @@
-import { createApp } from 'vue'
-import './style.css'
+import { createSSRApp } from 'vue'
 import App from './App.vue'
-import router from '../routes/route.js'
-import VueTheMask from 'vue-the-mask'
+import { createAppRouter } from '../routes/route'
+import './style.css'
 
-const app = createApp(App)
-app.use(router)
-app.use(VueTheMask)
-app.mount('#app')
+export function createApp(url) {
+  const app = createSSRApp(App)
+  const router = createAppRouter()
+
+  app.use(router)
+
+  // Только на клиенте
+//   if (!import.meta.env.SSR) {
+//     app.use(VueTheMask);
+//   }
+
+  router.push(url)
+
+  return new Promise((resolve) => {
+    router.isReady().then(() => resolve(app))
+  })
+}

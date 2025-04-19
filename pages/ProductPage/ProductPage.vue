@@ -1,4 +1,8 @@
 <template>
+    <div v-if="loading" class="loading-overlay">
+      <div class="spinner"></div>
+    </div>
+    <div>
     <NavBar :parentCategories="parentCategories"></NavBar>
     <div class="product-wrapp container">
         <router-link to="/catalog" class="back-link"><svg
@@ -24,6 +28,7 @@
             <ConsultationRequest>Позвоните нам, или оставьте заявку на звонок</ConsultationRequest>
         </div>
     <FooterComp :parentCategories="parentCategories"></FooterComp>
+    </div>
 </template>
 
 <script setup>
@@ -37,7 +42,11 @@ const props = defineProps({
    parentCategories: {
     type: Array,
     default: () => []
-   } 
+   },
+   loading: {
+    type: Boolean,
+    default: false
+   }
 });
 
 const consultationRef = ref(null);

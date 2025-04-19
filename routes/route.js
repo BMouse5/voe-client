@@ -1,11 +1,18 @@
-import { createRouter, createWebHistory } from "vue-router";
-//import { validateToken } from '../src/services/api.service';
+import { createRouter, createWebHistory, createMemoryHistory } from "vue-router";
+import { validateToken } from '../src/services/api.service';
 import MainPage from "../pages/MainPage/MainPage.vue";
 import AboutUsPage from "../pages/AboutUs/AboutUsPage.vue";
 import ContactsPage from "../pages/ContactsPage/ContactsPage.vue";
 import CatalogPage from "../pages/CatalogPage/CatalogPage.vue";
 import ProductPage from "../pages/ProductPage/ProductPage.vue";
 
+
+import AdminLogin from "../pages/AdminPanel/AdminLogin.vue";
+
+// Admin routes
+import AdminLayout from "../pages/AdminPanel/AdminLayout.vue";
+import AdminDashboard from "../pages/AdminPanel/AdminDashboard.vue";
+import AdminProducts from "../pages/AdminPanel/AdminProducts.vue";
 const routes = [
     {
         path: '/',
@@ -36,42 +43,86 @@ const routes = [
         name: 'product',
         component: ProductPage,
         props: true
-    }
-    // {
-    //     path: '/admin',
-    //     component: () => import('../pages/AdminPanel.vue'),
-    //     meta: { requiresAuth: true },
-    //     children: [
-    //       {
-    //         path: '',
-    //         redirect: '/admin/products'
-    //       },
-    //       {
-    //         path: 'products',
-    //         component: () => import('./views/AdminProducts.vue')
-    //       },
-    //       // ...другие админ-роуты
-    //     ]
-    //   },
-    //   {
-    //     path: '/admin/login',
-    //     component: () => import('../pages/AdminLogin.vue')
-    //   }
+    },
+    {
+        path: '/admin/login',
+        name: 'AdminLogin',
+        component: () => import('../pages/AdminPanel/AdminLogin.vue'),
+        meta: { requiresGuest: true }
+      },
+      {
+        path: '/admin',
+        component: () => import('../pages/AdminPanel/AdminLayout.vue'),
+        meta: { requiresAuth: true },
+        children: [
+          {
+            path: '',
+            redirect: '/admin/dashboard'
+          },
+          {
+            path: 'dashboard',
+            name: 'AdminDashboard',
+            component: () => import('../pages/AdminPanel/AdminDashboard.vue')
+          },
+          {
+            path: 'products',
+            name: 'AdminProducts',
+            component: () => import('../pages/AdminPanel/AdminProducts.vue')
+          },
+          {
+            path: 'products/new',
+            name: 'AdminNewProduct',
+            component: () => import('../pages/AdminPanel/EditProduct.vue'),
+            props: { isNew: true }
+          },
+          {
+            path: 'products/edit/:id',
+            name: 'AdminEditProduct',
+            component: () => import('../pages/AdminPanel/EditProduct.vue'),
+            props: true
+          },
+          {
+            path: 'categories',
+            name: 'AdminCategories',
+            component: () => import('../pages/AdminPanel/AdminCategories.vue')
+          }
+        ]
+      }
 ]
 
-const router = createRouter({
-    history: createWebHistory(),
-    routes
-})
+export function createAppRouter() {
+  const router = createRouter({
+    history: import.meta.env.SSR ? createMemoryHistory() : createWebHistory(),
+    routes,
+  });
 
-router.beforeEach(async (to, from, next) => {
-    if (to.meta.requiresAuth) {
-      const isAuthenticated = await validateToken();
-      if (!isAuthenticated) {
-        return next('/admin/login');
-      }
+  // Навесим навигационные защиты
+  router.beforeEach(async (to, from, next) => {
+    const isAuthenticated = await validateToken();
+
+    if (to.meta.requiresAuth && !isAuthenticated) {
+      return next('/admin/login');
     }
+
+    if (to.meta.requiresGuest && isAuthenticated) {
+      return next('/admin');
+    }
+
     next();
   });
 
-export default router;
+  router.afterEach((to, from) => {
+    if (typeof window !== 'undefined') {
+      if (to.hash) {
+        setTimeout(() => {
+          const element = document.querySelector(to.hash);
+          if (element) element.scrollIntoView({ behavior: 'smooth' });
+        }, 500);
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  });  
+
+  return router;
+}

@@ -1,7 +1,6 @@
 <template>
-  <!-- Шаблон остается без изменений -->
   <div class="slider">
-    <div class="slider-container">
+    <div v-if="slides.length > 0" class="slider-container">
       <div 
         class="slider-track" 
         :style="trackStyle"
@@ -21,22 +20,33 @@
               <ButtonComp>Узнать больше</ButtonComp>
             </div>
             <div class="image-content">
-              <img :src="slide.image" :alt="slide.title" />
+              <img 
+                :src="slide.image"
+                :alt="slide.title"
+                width="350"
+                height="300"
+                decoding="async"
+                loading="eager"
+                fetchpriority="high"
+              />
             </div>
           </div>
         </div>
       </div>
+
+      <div class="indicators">
+        <button
+          v-for="(slide, index) in slides"
+          :key="index"
+          :class="['indicator', { active: currentIndex === index }]"
+          @click="goToSlide(index)"
+          :aria-label="'Go to slide ' + (index + 1)"
+        ></button>
+      </div>
     </div>
 
-    <!-- Индикаторы -->
-    <div class="indicators">
-      <button
-        v-for="(slide, index) in slides"
-        :key="index"
-        :class="['indicator', { active: currentIndex === index }]"
-        @click="goToSlide(index)"
-        :aria-label="'Go to slide ' + (index + 1)"
-      ></button>
+    <div v-else class="error-message">
+      <p>К сожалению, на данный момент товары отсутствуют. Попробуйте позже!</p>
     </div>
   </div>
 </template>
@@ -45,6 +55,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import ButtonComp from '../../../src/components/UI/ButtonComp.vue';
 
+// === Props ===
 const props = defineProps({
   products: {
     type: Array,
@@ -56,7 +67,23 @@ const props = defineProps({
   }
 });
 
-// Логика компонента, использующая props.products и props.categories
+// === Preload первого изображения (ускоряем LCP) ===
+onMounted(() => {
+  if (props.products.length > 0) {
+    const preloadImage = `http://localhost:3000${props.products[0].image_url}`;
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = preloadImage;
+    document.head.appendChild(link);
+  }
+});
+
+// === Обработка продуктов ===
+const getImage = (imageUrl) => {
+  return `http://localhost:3000${imageUrl}`;
+};
+
 const slides = computed(() => {
   return props.products.map(product => ({
     title: product.name,
@@ -65,36 +92,28 @@ const slides = computed(() => {
   }));
 });
 
-const getImage = (imageUrl) => {
-  return `http://localhost:3000${imageUrl}`;
-};
-
+// === Слайдер — текущий индекс и свайпы ===
 const currentIndex = ref(0);
 const touchStartX = ref(0);
 const touchEndX = ref(0);
 
-// Стиль для трека слайдера
 const trackStyle = computed(() => ({
   transform: `translateX(-${currentIndex.value * 100}%)`,
   transition: 'transform 0.5s ease',
 }));
 
-// Переход к конкретному слайду
 const goToSlide = (index) => {
   currentIndex.value = index;
 };
 
-// Следующий слайд
 const nextSlide = () => {
   currentIndex.value = (currentIndex.value + 1) % slides.value.length;
 };
 
-// Предыдущий слайд
 const prevSlide = () => {
   currentIndex.value = (currentIndex.value - 1 + slides.value.length) % slides.value.length;
 };
 
-// Обработчики свайпа для мобильных устройств
 const handleTouchStart = (e) => {
   touchStartX.value = e.touches[0].clientX;
 };
@@ -111,7 +130,7 @@ const handleTouchEnd = () => {
   }
 };
 
-// Автопереключение слайдов
+// === Автопрокрутка ===
 let interval;
 
 const startInterval = () => {
@@ -132,6 +151,7 @@ onBeforeUnmount(() => {
   stopInterval();
 });
 </script>
+
 
 <style scoped>
 /* Стили остаются без изменений */
@@ -222,8 +242,9 @@ onBeforeUnmount(() => {
 }
 
 .image-content img {
-  max-width: 100%;
-  max-height: 80%;
+  max-width: 350px;
+  width: 100%;
+  height: 300px;
   object-fit: contain;
 }
 

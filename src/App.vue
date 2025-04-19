@@ -12,7 +12,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { fetchProducts, fetchCategories } from './services/api.service';
-
+import './style.css'
 const products = ref([]);
 const categories = ref([]);
 const parentCategories = ref([]);

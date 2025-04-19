@@ -1,16 +1,20 @@
 <template>
+  <div v-if="loading" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+  <div>
   <NavBar :parentCategories="parentCategories"></NavBar>
   <section class="carousel">
     <div class="carousel-wrapp container">
-      <CarouselComp 
+      <CarouselComp
         :products="filteredParentCategoryProducts"
         :categories="categories"
       />
     </div>
   </section>
-  <CreateProduct></CreateProduct>
+  <!-- <CreateProduct></CreateProduct>
   <deleteCategory></deleteCategory>
-  <ProductList></ProductList>
+  <ProductList></ProductList> -->
   <section class="carousel-about">
     <div class="carousel-about-wrapp container">
       <div class="carousel-about-title">
@@ -43,6 +47,7 @@
   </section>
   <ConsultationRequest>Оставьте заявку на консультацию</ConsultationRequest>
   <FooterComp :parentCategories="parentCategories"></FooterComp>
+  </div>
 </template>
 
 <script setup>
@@ -79,15 +84,23 @@ const props = defineProps({
   }
 });
 
-const filteredParentCategoryProducts = computed(() => {
-  const parentCategoryIds = props.categories
-    .filter(category => category.parent_id === null)
-    .map(category => category.id);
-  
-  return props.products.filter(product => 
-    parentCategoryIds.includes(product.category_id)
-  );
+// Добавляем проверку типа данных
+const safeCategories = computed(() => {
+  return Array.isArray(props.categories) ? props.categories : [];
 });
+
+const filteredParentCategoryProducts = computed(() => {
+  const parentCategoryIds = safeCategories.value
+    .filter(category => category?.parent_id === null)
+    .map(category => category?.id)
+    .filter(Boolean);
+  
+  return Array.isArray(props.products) 
+    ? props.products.filter(product => 
+        product?.category_id && parentCategoryIds.includes(product.category_id))
+    : [];
+});
+
 </script>
 <style scoped>
 .carousel {
@@ -96,6 +109,10 @@ const filteredParentCategoryProducts = computed(() => {
     box-shadow: 0px 4px 4px 0px #00000040;
     position: relative;
     z-index: 999;
+}
+
+.carousel-wrapp {
+  min-height: 423px;
 }
 
 .carousel-about {

@@ -65,7 +65,7 @@ const router = useRouter();
 
 const isMenuOpen = ref(false);
 const isDropdownOpen = ref(false);
-const isMobile = ref(window.innerWidth <= 768);
+const isMobile = ref(false); // ← начальное значение просто false
 
 const props = defineProps({
   parentCategories: {
@@ -73,31 +73,19 @@ const props = defineProps({
     required: true,
     default: () => []
   }
-})
-
-const navigateToCategory = (categoryId) => {
-  // Закрываем меню на мобильных устройствах
-  if (isMobile.value) {
-    isMenuOpen.value = false;
-    isDropdownOpen.value = false;
-  }
-  
-  // Переходим в каталог с query-параметром
-  router.push({ 
-    name: 'catalog', 
-    query: { category: categoryId } 
-  });
-};
+});
 
 const updateIsMobile = () => {
-  isMobile.value = window.innerWidth <= 768;
-  // Закрываем дропдаун при изменении размера, если перешли в десктопный режим
-  if (!isMobile.value) {
-    isDropdownOpen.value = false;
+  if (typeof window !== 'undefined') {
+    isMobile.value = window.innerWidth <= 768;
+    if (!isMobile.value) {
+      isDropdownOpen.value = false;
+    }
   }
 };
 
 onMounted(() => {
+  updateIsMobile(); // ← запускаем обновление при маунте
   window.addEventListener('resize', updateIsMobile);
   document.addEventListener('click', closeDropdownOnClickOutside);
 });
@@ -109,7 +97,6 @@ onBeforeUnmount(() => {
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
-  // Закрываем дропдаун при закрытии меню
   if (!isMenuOpen.value) {
     isDropdownOpen.value = false;
   }
@@ -118,19 +105,31 @@ const toggleMenu = () => {
 const handleDropdownClick = (event) => {
   if (isMobile.value) {
     event.preventDefault();
-    // Только для мобильной версии - переключаем состояние по клику
     isDropdownOpen.value = !isDropdownOpen.value;
   }
-  // Для десктопа ничего не делаем - работает по hover
 };
 
 const closeDropdownOnClickOutside = (event) => {
-  const dropdown = document.querySelector('.dropdown');
-  if (dropdown && !dropdown.contains(event.target)) {
-    isDropdownOpen.value = false;
+  if (typeof document !== 'undefined') {
+    const dropdown = document.querySelector('.dropdown');
+    if (dropdown && !dropdown.contains(event.target)) {
+      isDropdownOpen.value = false;
+    }
   }
 };
+
+const navigateToCategory = (categoryId) => {
+  if (isMobile.value) {
+    isMenuOpen.value = false;
+    isDropdownOpen.value = false;
+  }
+  router.push({ 
+    name: 'catalog', 
+    query: { category: categoryId } 
+  });
+};
 </script>
+
 
 <style scoped>
 /* Базовые стили */

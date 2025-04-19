@@ -1,4 +1,8 @@
 <template>
+    <div v-if="loading" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+  <div>
   <NavBar :parentCategories="parentCategories"></NavBar>
   <section class="catalog">
     <div class="catalog-wrapp container">
@@ -19,6 +23,7 @@
     </div>
   </section>
   <FooterComp :parentCategories="parentCategories"></FooterComp>
+  </div>
 </template>
 
 <script setup>
@@ -77,6 +82,10 @@ const props = defineProps({
   products: {
     type: Array,
     default: () => []
+  },
+  loading: {
+    type: Boolean,
+    default: false
   }
 });
 </script>
