@@ -57,7 +57,7 @@
               </ButtonComp>
             </form>
           </div>
-          <span class="consent-text">Оставляя заявку вы соглашаетесь с политикой обработки <a>персональных данных</a></span>
+          <span class="consent-text">Оставляя заявку вы соглашаетесь с политикой обработки <a href="/">персональных данных</a></span>
         </div>
       </div>
     </div>
@@ -174,6 +174,7 @@ const submitForm = async () => {
 .consultation {
   background-color: var(--primary-dark-gray);
   padding: clamp(60px, 10vw, 122px) 0;
+  min-height: 300px;
 }
 
 .consultation-cont {
@@ -189,7 +190,7 @@ const submitForm = async () => {
 }
 
 .consultation-title h3 {
-  font-family: 'Montserrat Bold';
+  font-family: 'Montserrat Bold', sans-serif;
   border-bottom: 1px solid var(--primary-orange-color);
   display: inline-block;
   padding-bottom: 10px;
@@ -230,6 +231,7 @@ const submitForm = async () => {
   color: var(--primary-orange-color);
   text-decoration: underline;
   transition: color 0.3s ease;
+  font-weight: 600;
 }
 
 .consent-text a:hover {
@@ -307,7 +309,7 @@ input::placeholder,
 textarea::placeholder {
   font-size: clamp(14px, 2vw, 18px);
   color: var(--primary-white-color);
-  font-family: 'Montserrat Bold';
+  font-family: 'Montserrat Bold', sans-serif;
   opacity: 0.8;
   transition: all 0.3s ease-in-out;
 }

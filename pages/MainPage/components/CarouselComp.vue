@@ -1,6 +1,7 @@
 <template>
   <div class="slider">
-    <div v-if="slides.length > 0" class="slider-container">
+    
+    <div v-show="slides.length > 0" class="slider-container">
       <div 
         class="slider-track" 
         :style="trackStyle"
@@ -17,7 +18,7 @@
             <div class="text-content">
               <h2 class="slide-title">{{ slide.title }}</h2>
               <p class="slide-description">{{ slide.description }}</p>
-              <ButtonComp>Узнать больше</ButtonComp>
+              <ButtonComp @click="navigateToCategory(slide.categoryId)">Узнать больше</ButtonComp>
             </div>
             <div class="image-content">
               <img 
@@ -33,7 +34,7 @@
           </div>
         </div>
       </div>
-
+      
       <div class="indicators">
         <button
           v-for="(slide, index) in slides"
@@ -45,7 +46,7 @@
       </div>
     </div>
 
-    <div v-else class="error-message">
+    <div v-show="slides.length === 0" class="error-message">
       <p>К сожалению, на данный момент товары отсутствуют. Попробуйте позже!</p>
     </div>
   </div>
@@ -53,8 +54,10 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { useRouter } from 'vue-router';
 import ButtonComp from '../../../src/components/UI/ButtonComp.vue';
 
+const router = useRouter()
 // === Props ===
 const props = defineProps({
   products: {
@@ -88,9 +91,18 @@ const slides = computed(() => {
   return props.products.map(product => ({
     title: product.name,
     description: product.description,
-    image: getImage(product.image_url)
+    image: getImage(product.image_url),
+    categoryId: product.category_id // предполагая, что product содержит category_id
   }));
 });
+
+// Функция для навигации в каталог
+const navigateToCategory = (categoryId) => {
+  router.push({ 
+    name: 'catalog', 
+    query: { category: categoryId } 
+  });
+};
 
 // === Слайдер — текущий индекс и свайпы ===
 const currentIndex = ref(0);
@@ -160,7 +172,7 @@ onBeforeUnmount(() => {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  height: auto;
+  min-height: 300px;
   background-color: transparent;
 }
 
@@ -246,6 +258,7 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 300px;
   object-fit: contain;
+  display: block;
 }
 
 .indicators {
@@ -276,6 +289,10 @@ onBeforeUnmount(() => {
 .indicator:focus-visible {
   outline: 2px solid var(--primary-orange-color);
   outline-offset: 2px;
+}
+
+.error-message {
+  min-height: 423px;
 }
 
 /* Адаптация для мобильных */

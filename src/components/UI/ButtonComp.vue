@@ -34,6 +34,7 @@ const dynamicClass = computed(() => {
   border: none;
   cursor: pointer;
   font-size: 16px;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;

@@ -3,7 +3,7 @@
       <div class="footer-cont container">
         <div class="footer-wrapper">
           <div class="footer-logo">
-            <img src="../assets/img/logo.png" alt="Логотип">
+            <img src="../assets/img/logo.png" alt="Логотип" style="width: 197px; height: 150px;">
           </div>
           <div class="footer-links footer-card">
             <h4>Каталог</h4>
@@ -88,6 +88,7 @@
     background-color: var(--primary-black-color);
     padding: clamp(40px, 5vw, 71px) 0;
     color: var(--primary-white-color);
+    min-height: 300px;
   }
   
   .footer-cont {
@@ -139,7 +140,7 @@
     color: var(--primary-white-color);
     text-decoration: none;
     transition: color 0.3s ease;
-    font-size: clamp(12px, 1vw, 14px);
+    font-size: clamp(15px, 1vw, 18px);
   }
   
   .footer-links a:hover {

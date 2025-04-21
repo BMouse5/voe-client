@@ -1,4 +1,19 @@
 <template>
+        <router-link to="/" class="back-link"><svg
+              class="arrow-icon"
+              width="16"
+              height="10"
+              viewBox="0 0 12 8"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M1 1.5L6 6.5L11 1.5"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg></router-link>
     <div class="admin-login">
       <div class="login-container">
         <h1>Админ логин</h1>
@@ -127,4 +142,20 @@
     margin-top: 1rem;
     text-align: center;
   }
+
+  .arrow-icon {
+    transform: rotate(90deg);
+}
+
+
+path {
+    stroke: var(--primary-black-color);
+    transition: all 0.3s ease
+}
+
+.back-link {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
   </style>

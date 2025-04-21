@@ -184,7 +184,7 @@ h5 {
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-height: 36px;
+  min-height: 48px;
 }
 
 /* Адаптивность */
@@ -259,7 +259,7 @@ h5 {
   
   h5 {
     font-size: 15px;
-    min-height: 40px;
+    min-height: 60px;
   }
 }
 

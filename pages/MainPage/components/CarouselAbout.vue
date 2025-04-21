@@ -36,7 +36,7 @@
               <div class="overlay-content">
                 <div class="overlay-text">{{ card.description }}</div>
                 <div class="overlay-button">
-                  <ButtonComp variant="transparent">Подробнее</ButtonComp>
+                  <ButtonComp variant="transparent" @click="navigateToProduct(card.id)">Подробнее</ButtonComp>
                 </div>
               </div>
             </div>
@@ -53,7 +53,9 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import ButtonComp from '../../../src/components/UI/ButtonComp.vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const props = defineProps({
   products: {
     type: Array,
@@ -107,12 +109,21 @@ const cards = computed(() => {
   return props.products
     .filter(product => subcategoryIds.includes(product.category_id))
     .map(product => ({
+      id: product.id,
       title: product.name,
       name: product.name,
       description: product.description,
       image: getImage(product.image_url)
     }))
 })
+
+const navigateToProduct = (productId) => {
+  router.push({ 
+    name: 'product',
+    params: { id: productId }
+  });
+};
+
 
 // Методы слайдера
 const startDrag = (e) => {

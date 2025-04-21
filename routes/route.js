@@ -18,25 +18,41 @@ const routes = [
         path: '/',
         name: MainPage,
         component: MainPage,
-        props: true
+        props: true,
+        meta: {
+          title: 'Victory Oil Energy - Главная',
+          description: 'Производство высококачественных аналоговых нефтегазовых деталей'
+      }
     },
     {
         path: '/about-us',
         name: AboutUsPage,
         component: AboutUsPage,
-        props: true
+        props: true,
+        meta: {
+          title: 'О компании | Victory Oil Energy',
+          description: 'Информация о компании Victory Oil Energy и нашей деятельности'
+      }
     },
     {
         path: '/contacts',
         name: ContactsPage,
         component: ContactsPage,
-        props: true
+        props: true,
+        meta: {
+          title: 'Контакты | Victory Oil Energy',
+          description: 'Как связаться с Victory Oil Energy - адреса, телефоны, электронная почта'
+      }
     },
     {
         path: '/catalog',
         name: 'catalog',
         component: CatalogPage,
-        props: (route) => ({ categoryId: route.query.category })
+        props: (route) => ({ categoryId: route.query.category }),
+        meta: {
+          title: 'Каталог продукции | Victory Oil Energy',
+          description: 'Каталог нефтегазовых компонентов и деталей производства Victory Oil Energy'
+      }
     },
     {
         path: '/product/:id',
@@ -122,7 +138,23 @@ export function createAppRouter() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
-  });  
+  });
+
+  router.afterEach((to) => {
+    if (typeof document !== 'undefined') {
+        document.title = to.meta?.title || 'Victory Oil Energy'
+        
+        // Обновляем meta description
+        let metaDescription = document.querySelector('meta[name="description"]')
+        if (!metaDescription) {
+            metaDescription = document.createElement('meta')
+            metaDescription.name = 'description'
+            document.head.appendChild(metaDescription)
+        }
+        metaDescription.content = to.meta?.description || 'Производство аналоговых нефтегазовых деталей'
+    }
+})
+  
 
   return router;
 }

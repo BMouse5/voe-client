@@ -27,11 +27,11 @@ const handleLogout = async () => {
   try {
     await logout();
     localStorage.removeItem('adminToken');
-    router.push('/admin/login');
+    router.push('/');
     window.location.reload();
   } catch (error) {
     console.error('Logout failed:', error);
-    router.push('/admin/login');
+    router.push('/');
   }
 };
 </script>

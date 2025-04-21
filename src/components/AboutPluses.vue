@@ -121,7 +121,7 @@ const props = defineProps({
     align-items: center;
     color: white;
     text-align: center;
-    font-family: 'Montserrat Bold';
+    font-family: 'Montserrat Bold', sans-serif;
     padding: 15px;
     box-sizing: border-box;
     transition: all 0.3s ease;

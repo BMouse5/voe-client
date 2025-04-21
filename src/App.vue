@@ -1,8 +1,8 @@
 <template>
-  <div id="app">
+  <div>
     <router-view 
-      :products="products" 
-      :categories="categories" 
+  :products="products" 
+  :categories="categories"
       :parentCategories="parentCategories"
       :loading="loading"
     ></router-view>
@@ -10,34 +10,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, inject } from 'vue';
 import { fetchProducts, fetchCategories } from './services/api.service';
 import './style.css'
-const products = ref([]);
-const categories = ref([]);
+const products = ref(inject('initialProducts', []))
+const categories = ref(inject('initialCategories', []))
 const parentCategories = ref([]);
 const loading = ref(true);
 
-const loadData = async () => {
-  try {
-    loading.value = true;
-    const [productsData, categoriesData] = await Promise.all([
-      fetchProducts(),
-      fetchCategories()
-    ]);
-    products.value = productsData;
-    categories.value = categoriesData;
-    parentCategories.value = categoriesData.filter(category => category.parent_id === null);
-  } catch (error) {
-    console.error('Ошибка загрузки данных:', error);
-  } finally {
-    loading.value = false;
+onMounted(async () => {
+  if (products.value.length === 0 || categories.value.length === 0) {
+    loading.value = true
+    try {
+      const [productsData, categoriesData] = await Promise.all([
+        fetchProducts(),
+        fetchCategories()
+      ])
+      products.value = productsData
+      categories.value = categoriesData
+    } catch (err) {
+      console.error('Ошибка загрузки данных:', err)
+    } finally {
+      loading.value = false
+    }
   }
-};
 
-onMounted(() => {
-  loadData();
-});
+  parentCategories.value = categories.value.filter(c => c.parent_id === null)
+})
 </script>
 
 <style>

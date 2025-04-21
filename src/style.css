@@ -20,17 +20,21 @@
 }
 
 @font-face {
-  font-family: 'Montserrat';
+  font-family: 'Montserrat', sans-serif;
   src: url('../src/assets/fonts/Montserrat-Regular.ttf');
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Montserrat Bold';
+  font-family: 'Montserrat Bold', sans-serif;
   src: url('../src/assets/fonts/Montserrat-Bold.ttf');
   font-weight: 700;
   font-display: swap;
+}
+
+body {
+  min-height: 100vh;
 }
 
 *, *::after, *::before {
@@ -108,6 +112,12 @@ button {
   width: 50px;
   height: 50px;
   animation: spin 2s linear infinite;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
 @keyframes spin {

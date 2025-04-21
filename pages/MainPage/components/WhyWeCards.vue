@@ -102,7 +102,7 @@
     justify-content: center;
     align-items: center;
     height: 100%;
-    font-family: 'Montserrat Bold';
+    font-family: 'Montserrat Bold', sans-serif;
     font-size: clamp(16px, 4vw, 24px);
     transition: opacity 0.2s ease-in-out;
 }
@@ -119,7 +119,7 @@
     justify-content: center;
     align-items: center;
     height: 100%;
-    font-family: 'Montserrat Bold';
+    font-family: 'Montserrat Bold', sans-serif;
     font-size: clamp(16px, 4vw, 24px);
     transition: opacity 0.2s ease-in-out;
     opacity: 0;

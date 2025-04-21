@@ -3,7 +3,7 @@
     <div class="nav-wrapp container">
       <div class="logo-wrapp">
         <router-link to="/">
-          <img src="../assets/img/logo.png" alt="Voe logo" class="logo-img">
+          <img src="../assets/img/logo.png" alt="Voe logo" class="logo-img" style="width: 135px; height: 74px;">
         </router-link>
       </div>
       

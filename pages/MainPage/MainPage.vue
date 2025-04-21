@@ -5,10 +5,11 @@
   <div>
   <NavBar :parentCategories="parentCategories"></NavBar>
   <section class="carousel">
-    <div class="carousel-wrapp container">
+    <div class="carousel-wrapp container" :style="{ minHeight: loading ? '450px' : 'auto' }">
       <CarouselComp
         :products="filteredParentCategoryProducts"
         :categories="categories"
+        :loading="loading"
       />
     </div>
   </section>
@@ -109,15 +110,18 @@ const filteredParentCategoryProducts = computed(() => {
     box-shadow: 0px 4px 4px 0px #00000040;
     position: relative;
     z-index: 999;
+    min-height: 450px; /* или установите фиксированную высоту */
 }
 
 .carousel-wrapp {
-  min-height: 423px;
+  min-height: 450px;
+  position: relative;
 }
 
 .carousel-about {
     padding: 87px 10px 97px 10px;
     background-color: var(--primary-dark-gray);
+    min-height: 300px;
 }
 
 .carousel-about-title {
@@ -145,6 +149,7 @@ const filteredParentCategoryProducts = computed(() => {
   box-shadow: 0px 4px 4px 0px #00000040;
   position: relative;
   z-index: 2;
+  min-height: 400px;
 }
 
 .why-we-wrapp {
@@ -158,7 +163,7 @@ const filteredParentCategoryProducts = computed(() => {
   color: transparent;
   -webkit-text-stroke: 1px var(--primary-white-color);
   text-transform: uppercase;
-  font-family: 'Montserrat Bold';
+  font-family: 'Montserrat Bold', sans-serif;
   line-height: 1.2;
   margin-bottom: 30px;
 }
