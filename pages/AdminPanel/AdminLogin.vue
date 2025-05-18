@@ -32,7 +32,7 @@
           <button type="submit" :disabled="loading">
             {{ loading ? 'Вход...' : 'Вход' }}
           </button>
-          <p v-if="error" class="error-message">{{ error }}</p>
+          <p v-if="error" class="error-message">Неверный пароль</p>
         </form>
       </div>
     </div>
@@ -119,7 +119,7 @@
   button {
     width: 100%;
     padding: 0.75rem;
-    background-color: #4CAF50;
+    background-color: var(--primary-orange-color);
     color: white;
     border: none;
     border-radius: 4px;
@@ -129,7 +129,7 @@
   }
   
   button:hover {
-    background-color: #45a049;
+    background-color: var(--primary-dark-orange);
   }
   
   button:disabled {
@@ -143,7 +143,7 @@
     text-align: center;
   }
 
-  .arrow-icon {
+.arrow-icon {
     transform: rotate(90deg);
 }
 

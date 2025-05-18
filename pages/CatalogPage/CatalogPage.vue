@@ -6,6 +6,13 @@
   <NavBar :parentCategories="parentCategories"></NavBar>
   <section class="catalog">
     <div class="catalog-wrapp container">
+      <input 
+      type="text" 
+      placeholder="Поиск товара" 
+      v-if="currentView" 
+      class="search-input"
+      v-model="searchQuery"
+      >
       <div class="categories-wrapp">
         <CatalogCategories 
           :categories="categories" 
@@ -16,9 +23,14 @@
       </div>
       <div class="product-wrapp">
         <CatalogProducts 
-          :products="filteredProducts"
-          :selected-category="selectedCategoryId"
-        ></CatalogProducts>
+  :parent-categories="parentCategories"
+  :categories="categories"
+  :products="filteredProducts"
+  @select-parent="handleParentSelect"
+  @select-child="handleChildSelect"
+  @reset="handleReset"
+  @view-change="searchProducts"
+></CatalogProducts>
       </div>
     </div>
   </section>
@@ -36,6 +48,14 @@ import CatalogProducts from './components/CatalogProducts.vue';
 
 const route = useRoute();
 const selectedCategoryId = ref(null);
+const currentView = ref(null)
+const searchQuery = ref('')
+const searchProducts = (view) => {
+  currentView.value = view
+  if (!view) {
+    searchQuery.value = ''
+  }
+}
 
 // Обработка query-параметра при загрузке
 onMounted(() => {
@@ -57,17 +77,33 @@ watch(
 );
 
 const filteredProducts = computed(() => {
-  if (!selectedCategoryId.value) return props.products;
-  
-  const childCategories = props.categories.filter(
-    cat => cat.parent_id === selectedCategoryId.value
-  ).map(cat => cat.id);
-  
-  const categoriesToFilter = [selectedCategoryId.value, ...childCategories];
-  
-  return props.products.filter(
-    product => categoriesToFilter.includes(product.category_id)
-  );
+  let productsByCategory = props.products;
+
+  if (selectedCategoryId.value) {
+    const childCategories = props.categories
+      .filter(cat => cat.parent_id === selectedCategoryId.value)
+      .map(cat => cat.id);
+
+    const categoriesToFilter = [selectedCategoryId.value, ...childCategories];
+    productsByCategory = props.products.filter(
+      product => categoriesToFilter.includes(product.category_id)
+    );
+  }
+
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.trim().toLowerCase();
+    productsByCategory = productsByCategory.filter(product =>
+      product.name.toLowerCase().includes(query)
+    );
+  }
+
+  console.log("Filtered Products:", productsByCategory); // Проверка результата
+  return productsByCategory;
+});
+
+
+watch(searchQuery, () => {
+  console.log("Search query changed:", searchQuery.value);
 });
 
 const props = defineProps({
@@ -88,6 +124,19 @@ const props = defineProps({
     default: false
   }
 });
+
+const handleParentSelect = (parent) => {
+  selectedCategoryId.value = parent.id;
+};
+
+const handleChildSelect = (child) => {
+  selectedCategoryId.value = child.id;
+  // Дополнительная логика если нужно
+};
+
+const handleReset = () => {
+  selectedCategoryId.value = null;
+};
 </script>
 
 <style scoped>
@@ -104,6 +153,20 @@ const props = defineProps({
   padding: 0 15px;
   box-sizing: border-box;
   min-height: 100vh;
+  position:relative;
+  margin-top: 35px;
+}
+.search-input {
+  position: absolute;
+  top: -45px;
+  right: 20px;
+  border-radius: 20px;
+  padding: 10px;
+  border: none;
+}
+
+.search-input:focus {
+  border: 1px solid var(--primary-orange-color);
 }
 
 .categories-wrapp {
@@ -121,7 +184,7 @@ const props = defineProps({
 /* Планшетная версия */
 @media (min-width: 768px) {
   .catalog {
-    padding: 40px 0;
+    padding: 20px 0;
   }
   
   .catalog-wrapp {

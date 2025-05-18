@@ -78,7 +78,7 @@
     // Просто перенаправляем с query-параметром
     router.push({ 
       name: 'catalog', 
-      query: { category: categoryId } 
+      query: { parent: categoryId } 
     });
   };
   </script>

@@ -140,9 +140,13 @@ export const fetchCategoryById = async (id) => {
   }
 };
 
-export const createCategory = async (categoryData) => {
+export const createCategory = async (formData) => {
   try {
-    const response = await api.post('/categories', categoryData);
+    const response = await api.post('/categories', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('Ошибка при создании категории:', error);
@@ -150,9 +154,13 @@ export const createCategory = async (categoryData) => {
   }
 };
 
-export const updateCategory = async (id, categoryData) => {
+export const updateCategory = async (id, formData) => {
   try {
-    const response = await api.put(`/categories/${id}`, categoryData);
+    const response = await api.put(`/categories/${id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('Ошибка при обновлении категории:', error);
@@ -186,6 +194,16 @@ export const fetchCategoryProductsCount = async (categoryId) => {
     return response.data;
   } catch (error) {
     console.error('Ошибка при получении количества товаров:', error);
+    throw error;
+  }
+};
+
+export const fetchProductsByCategory = async (categoryId) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/products/category/${categoryId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при получении продуктов по категории:', error);
     throw error;
   }
 };

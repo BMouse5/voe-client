@@ -1,89 +1,103 @@
 <template>
-    <div class="admin-products">
-      <div class="header">
-        <h2>Администрирование товаров</h2>
-        <router-link to="/admin/products/new" class="add-btn">
-          Добавить товар
-        </router-link>
-      </div>
-      
-      <div v-if="loading" class="loading">Загрузка...</div>
-      
-      <table v-else class="products-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Название</th>
-            <th>Категория</th>
-            <th>Фото</th>
-            <th>Действие</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="product in products" :key="product.id">
-            <td>{{ product.id }}</td>
-            <td>{{ product.name }}</td>
-            <td>{{ getCategoryName(product.category_id) }}</td>
-            <td>
-            <img 
-              v-if="product.fullImageUrl" 
-              :src="product.fullImageUrl" 
-              :alt="product.name"
-              style="max-width: 100px; max-height: 100px;"
-            >
-            <span v-else>Нет фото</span>
-           </td>
-            <td class="actions">
-              <router-link 
-                :to="`/admin/products/edit/${product.id}`" 
-                class="edit-btn"
-              >
-                Редактировать
-              </router-link>
-              <button 
-                @click="confirmDelete(product.id)" 
-                class="delete-btn"
-                :disabled="deleteLoading[product.id]"
-              >
-                {{ deleteLoading[product.id] ? 'Удаление...' : 'Удалить' }}
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  <div class="admin-products">
+    <div class="header">
+      <h2>Администрирование товаров</h2>
+      <router-link to="/admin/products/new" class="add-btn">
+        Добавить товар
+      </router-link>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, onMounted } from 'vue';
-  import { fetchProducts, fetchCategories, deleteProduct } from '../../src/services/api.service';
-  
-  const products = ref([]);
-  const categories = ref([]);
-  const loading = ref(true);
-  const deleteLoading = ref({}); // Для отслеживания состояния удаления каждого товара
-  const errorMessage = ref('');
-  
-  const getImageUrl = (imagePath) => {
+
+    <div v-if="loading" class="loading">Загрузка...</div>
+
+    <table v-else class="products-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Название</th>
+          <th>Категория</th>
+          <th>Фото</th>
+          <th>Действие</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="product in products" :key="product.id">
+          <td>{{ product.id }}</td>
+          <td>{{ product.name }}</td>
+          <td>{{ getCategoryName(product.category_id) }}</td>
+          <td>
+            <img
+              v-if="product.fullImageUrl"
+              :src="product.fullImageUrl"
+              :alt="product.name"
+            />
+            <span v-else>Нет фото</span>
+          </td>
+          <td class="actions">
+            <router-link
+              :to="`/admin/products/edit/${product.id}`"
+              class="edit-btn"
+            >
+              Редактировать
+            </router-link>
+            <button
+              @click="showDeleteConfirmation(product.id)"
+              class="delete-btn"
+              :disabled="deleteLoading[product.id]"
+            >
+              {{ deleteLoading[product.id] ? 'Удаление...' : 'Удалить' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Модальное окно -->
+    <div v-if="showDeleteModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>Подтверждение удаления</h3>
+        <p>{{ deleteMessage }}</p>
+        
+        <div class="modal-actions">
+          <button @click="proceedWithDelete" class="confirm-btn">Удалить</button>
+          <button @click="cancelDelete" class="cancel-btn">Отмена</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import { fetchProducts, fetchCategories, deleteProduct } from '../../src/services/api.service';
+
+const products = ref([]);
+const categories = ref([]);
+const loading = ref(true);
+const deleteLoading = ref({});
+const errorMessage = ref('');
+
+const showDeleteModal = ref(false); // Состояние модального окна
+const deleteMessage = ref('');
+const deleteProductId = ref(null); // ID удаляемого товара
+
+const getImageUrl = (imagePath) => {
   if (!imagePath) return '';
   if (imagePath.startsWith('http')) return imagePath;
   return `http://localhost:3000${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
 };
 
-
 onMounted(async () => {
   try {
     const [productsData, categoriesData] = await Promise.all([
       fetchProducts(),
-      fetchCategories()
+      fetchCategories(),
     ]);
-    
-    // Добавляем полный URL изображения для каждого продукта
+
     products.value = productsData.map(product => ({
       ...product,
-      fullImageUrl: getImageUrl(product.image_url)
+      fullImageUrl: getImageUrl(product.image_url),
     }));
-    
+
     categories.value = categoriesData;
   } catch (error) {
     console.error('Ошибка загрузки данных:', error);
@@ -92,31 +106,41 @@ onMounted(async () => {
     loading.value = false;
   }
 });
-  
-  const getCategoryName = (categoryId) => {
-    const category = categories.value.find(c => c.id === categoryId);
-    return category ? category.name : 'Неизвестно';
-  };
-  
-  const confirmDelete = (productId) => {
-    if (confirm('Вы уверены, что хотите удалить этот товар?')) {
-      deleteProductHandler(productId);
-    }
-  };
-  
-  const deleteProductHandler = async (productId) => {
-    try {
-      deleteLoading.value[productId] = true;
-      await deleteProduct(productId);
-      products.value = products.value.filter(p => p.id !== productId);
-    } catch (error) {
-      console.error('Ошибка при удалении товара:', error);
-      errorMessage.value = 'Не удалось удалить товар';
-    } finally {
-      deleteLoading.value[productId] = false;
-    }
-  };
-  </script>
+
+const getCategoryName = (categoryId) => {
+  const category = categories.value.find(c => c.id === categoryId);
+  return category ? category.name : 'Неизвестно';
+};
+
+const showDeleteConfirmation = (productId) => {
+  deleteProductId.value = productId;
+  deleteMessage.value = `Вы уверены, что хотите удалить товар с ID ${productId}?`;
+  showDeleteModal.value = true;
+};
+
+const proceedWithDelete = async () => {
+  if (!deleteProductId.value) return;
+
+  const productId = deleteProductId.value;
+  try {
+    deleteLoading.value[productId] = true;
+    await deleteProduct(productId);
+    products.value = products.value.filter(p => p.id !== productId);
+  } catch (error) {
+    console.error('Ошибка при удалении товара:', error);
+    errorMessage.value = 'Не удалось удалить товар';
+  } finally {
+    deleteLoading.value[productId] = false;
+    showDeleteModal.value = false;
+    deleteProductId.value = null;
+  }
+};
+
+const cancelDelete = () => {
+  showDeleteModal.value = false;
+  deleteProductId.value = null;
+};
+</script>
   
   <style scoped>
   .admin-products {
@@ -132,7 +156,7 @@ onMounted(async () => {
   }
   
   .add-btn {
-    background-color: #4CAF50;
+    background-color: var(--primary-orange-color);
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 4px;
@@ -141,7 +165,7 @@ onMounted(async () => {
   }
   
   .add-btn:hover {
-    background-color: #45a049;
+    background-color: var(--primary-dark-orange);
   }
   
   .loading {
@@ -169,6 +193,10 @@ onMounted(async () => {
     text-align: left;
     vertical-align: middle; /* Выравнивание по вертикали */
     word-wrap: break-word; /* Перенос длинных слов */
+  }
+
+  .products-table td {
+    height: 85px;
   }
   
   .products-table th {
@@ -211,6 +239,7 @@ onMounted(async () => {
   .actions {
     display: flex;
     gap: 0.5rem;
+    align-items: center;
   }
   
   .edit-btn {
@@ -248,13 +277,68 @@ onMounted(async () => {
   /* Стили для изображений */
   .products-table img {
     max-width: 100px;
-    max-height: 100px;
+    max-height: 60px;
     width: auto;
     height: auto;
     display: block;
     margin: 0 auto;
     object-fit: contain; /* Сохраняет пропорции */
   }
+
+  .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: left;
+  max-width: 500px;
+  width: 100%;
+}
+
+.modal-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: right;
+  gap: 1rem;
+}
+
+.confirm-btn {
+  background-color: #f44336;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background-color: #ccc;
+  color: black;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.confirm-btn:hover {
+  background-color: #d32f2f;
+}
+
+.cancel-btn:hover {
+  background-color: #bbb;
+}
   
   /* Адаптивность для мобильных устройств */
   @media (max-width: 768px) {

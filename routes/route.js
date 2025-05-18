@@ -13,6 +13,8 @@ import AdminLogin from "../pages/AdminPanel/AdminLogin.vue";
 import AdminLayout from "../pages/AdminPanel/AdminLayout.vue";
 import AdminDashboard from "../pages/AdminPanel/AdminDashboard.vue";
 import AdminProducts from "../pages/AdminPanel/AdminProducts.vue";
+import PrivacyPolicy from "../pages/PrivacyPolicy.vue";
+import Basket from "../pages/Basket.vue";
 const routes = [
     {
         path: '/',
@@ -98,11 +100,40 @@ const routes = [
             props: true
           },
           {
-            path: 'categories',
+            path: '/admin/categories',
             name: 'AdminCategories',
-            component: () => import('../pages/AdminPanel/AdminCategories.vue')
+            component: () => import('../pages/AdminPanel/AdminCategories.vue'),
+            meta: { requiresAuth: true, admin: true }
+          },
+          {
+            path: '/admin/categories/new',
+            name: 'CreateCategory',
+            component: () => import('../pages/AdminPanel/EditCategory.vue'),
+            meta: { requiresAuth: true, admin: true }
+          },
+          {
+            path: '/admin/categories/edit/:id',
+            name: 'EditCategory',
+            component: () => import('../pages/AdminPanel/EditCategory.vue'),
+            meta: { requiresAuth: true, admin: true },
+            props: true
+          },
+          {
+            path: '/admin/consultations',
+            name: 'AdminConsultation',
+            component: () => import('../pages/AdminPanel/AdminConsultation.vue'),
           }
         ]
+      },
+      {
+        path: '/privacy-policy',
+        name: 'PrivacyPolicy',
+        component: PrivacyPolicy
+      },
+      {
+        path: '/basket',
+        name: 'Basket',
+        component: Basket
       }
 ]
 

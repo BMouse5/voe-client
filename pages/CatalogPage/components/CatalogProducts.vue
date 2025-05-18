@@ -1,58 +1,256 @@
 <template>
-    <div class="products-wrapp">
-        <h4 @click="$emit('reset-category')">
-      {{ selectedCategory ? 'Товары категории' : 'Все товары' }}
+  <div class="products-wrapp">
+    <h4 @click="resetSelection">
+      {{ currentView === 'products' ? selectedCategory.name : 
+         currentView === 'subcategories' ? selectedParent.name : 
+         'Все категории' }}
     </h4>
-      <div class="product-list">
-        <div class="card" v-for="product in products" :key="product.id" @click="goToProduct(product.id)">
-          <div class="card-body">
-            <img 
-              v-if="product.image_url" 
-              :src="getImage(product.image_url)" 
-              :alt="product.name"
-              class="product-image"
-            >
-            <div class="card-buy">
-              <img src="/src/assets/img/cart.svg" alt="Купить" class="cart-icon">
-              <span class="buy-text">Купить</span>
-            </div>
+    
+    <!-- Отображение родительских категорий -->
+    <div v-if="currentView === 'parents'" class="product-list">
+      <div 
+        v-for="parent in parentCategories" 
+        :key="parent.id" 
+        class="card" 
+        @click="selectParent(parent)"
+      >
+        <div class="card-body">
+          <img 
+            v-if="parent.image_url" 
+            :src="getImageUrl(parent.image_url)" 
+            :alt="parent.name"
+            class="product-image"
+            @error="handleImageError"
+          >
+          <div v-else class="no-image">Нет изображения</div>
+          <div class="card-buy">
+            <img src="/src/assets/img/eye.svg" alt="Купить" class="cart-icon">
+            <span class="buy-text">Перейти</span>
           </div>
-          <h5>{{ product.name }}</h5>
         </div>
+        <h5>{{ parent.name }}</h5>
       </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref } from 'vue'
-  import { useRouter } from 'vue-router';
+    
+    <!-- Отображение подкатегорий -->
+    <div v-else-if="currentView === 'subcategories'" class="product-list">
+      <div 
+        v-for="child in childCategories" 
+        :key="child.id" 
+        class="card" 
+        @click="selectChild(child)"
+      >
+        <div class="card-body">
+          <img 
+            v-if="child.image_url" 
+            :src="getImageUrl(child.image_url)" 
+            :alt="child.name"
+            class="product-image"
+            @error="handleImageError"
+          >
+          <div v-else class="no-image">Нет изображения</div>
+          <div class="card-buy">
+            <img src="/src/assets/img/eye.svg" alt="Купить" class="cart-icon">
+            <span class="buy-text">Перейти</span>
+          </div>
+        </div>
+        <h5>{{ child.name }}</h5>
+      </div>
+    </div>
+    
+    <!-- Отображение товаров -->
+    <div v-else-if="currentView === 'products'" class="product-list">
+      <div v-if="props.products.length === 0">
+        <h5>Товары не найдены</h5>
+      </div>
+      <div 
+        v-else
+        v-for="product in props.products" 
+        :key="product.id" 
+        class="card" 
+        @click="goToProduct(product.id)"
+      >
+        <div class="card-body">
+          <img 
+            v-if="product.image_url" 
+            :src="getImageUrl(product.image_url)" 
+            :alt="product.name"
+            class="product-image"
+            @error="handleImageError"
+          >
+          <div v-else class="no-image">Нет изображения</div>
+          <div class="card-buy">
+            <img src="/src/assets/img/cart.svg" alt="Купить" class="cart-icon">
+            <span class="buy-text">Заказать</span>
+          </div>
+        </div>
+        <h5>{{ product.name }}</h5>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, watch, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { fetchProductsByCategory, fetchChildCategories } from '../../../src/services/api.service';
 
 const router = useRouter();
-  const props = defineProps({
-    products: {
-      type: Array,
-      default: () => []
-    },
-    selectedCategory: {
-      type: [Number, String],
-      default: null
-    }
-  })
-  
-  const getImage = (imageUrl) => {
-    return `http://localhost:3000${imageUrl}`
-  }
+const route = useRoute();
 
-  const goToProduct = (productId) => {
-    router.push({ 
-        name: 'product', 
-        params: { id: productId } 
-    });
-};
-  </script>
+const props = defineProps({
+  parentCategories: {
+    type: Array,
+    default: () => []
+  },
+  categories: {
+    type: Array,
+    default: () => []
+  },
+  products: {
+    type: Array,
+    default: () => []
+  }
+});
+console.log("PROPS in CatalogProducts:", {
+  parentCategories: props.parentCategories,
+  categories: props.categories
+});
+const emit = defineEmits(['reset', 'view-change']);
+
+const products = ref([]);
+const childCategories = ref([]);
+const selectedParent = ref(null);
+const selectedCategory = ref(null);
+const currentView = ref('parents');
+
+// Функция для получения корректного URL изображения
+const getImageUrl = (imagePath) => {
+  if (!imagePath) {
+    console.log("Empty image path");
+    return '';
+  }
   
-  <style scoped>
-/* Основные стили контейнера */
+  if (imagePath.startsWith('http')) {
+    console.log("Absolute image path:", imagePath);
+    return imagePath;
+  }
+  
+  const cleanPath = imagePath.replace(/^\/+/, '');
+  const fullUrl = `http://localhost:3000/${cleanPath}`;
+  console.log("Generated image URL:", fullUrl);
+  return fullUrl;
+};
+
+// Обработчик ошибок загрузки изображения
+const handleImageError = (event) => {
+  event.target.style.display = 'none';
+  const noImageDiv = event.target.nextElementSibling;
+  if (noImageDiv && noImageDiv.classList.contains('no-image')) {
+    noImageDiv.style.display = 'flex';
+  }
+};
+
+const goToProduct = (productId) => {
+  router.push({ 
+    name: 'product', 
+    params: { id: productId } 
+  });
+};
+
+const selectParent = async (parent) => {
+  selectedParent.value = parent;
+  try {
+    childCategories.value = await fetchChildCategories(parent.id);
+    currentView.value = 'subcategories';
+    router.push({ 
+      name: 'catalog', 
+      query: { parent: parent.id } 
+    });
+  } catch (error) {
+    console.error('Ошибка при загрузке подкатегорий:', error);
+  }
+};
+
+const selectChild = async (child) => {
+  selectedCategory.value = child;
+  try {
+    console.log("Filtering products for category:", child.id);
+    console.log("All products:", props.products);
+    
+    // Фильтруем товары по category_id
+    products.value = props.products.filter(p => p.category_id === child.id);
+    
+    console.log("Filtered products:", products.value);
+    
+    currentView.value = 'products';
+    router.push({ 
+      name: 'catalog', 
+      query: { 
+        parent: child.parent_id,
+        child: child.id
+      } 
+    });
+  } catch (error) {
+    console.error('Ошибка при загрузке товаров:', error);
+    products.value = [];
+  }
+};
+
+const resetSelection = () => {
+  selectedParent.value = null;
+  selectedCategory.value = null;
+  currentView.value = 'parents';
+  emit('reset');
+  router.push({ name: 'catalog' });
+};
+
+// Обработка начального состояния при загрузке страницы
+onMounted(() => {
+  if (route.query.child) {
+    const childId = parseInt(route.query.child);
+    const child = props.categories.find(c => c.id === childId);
+    if (child) {
+      selectedCategory.value = child;
+      selectChild(child);
+    }
+  } else if (route.query.parent) {
+    const parentId = parseInt(route.query.parent);
+    const parent = props.parentCategories.find(p => p.id === parentId);
+    if (parent) {
+      selectParent(parent);
+    }
+  }
+});
+
+// Отслеживание изменений в route
+watch(
+  () => route.query,
+  (newQuery) => {
+    if (newQuery.child) {
+      const childId = parseInt(newQuery.child);
+      const child = props.categories.find(c => c.id === childId);
+      if (child && (!selectedCategory.value || selectedCategory.value.id !== childId)) {
+        selectChild(child);
+      }
+    } else if (newQuery.parent) {
+      const parentId = parseInt(newQuery.parent);
+      const parent = props.parentCategories.find(p => p.id === parentId);
+      if (parent && (!selectedParent.value || selectedParent.value.id !== parentId)) {
+        selectParent(parent);
+      }
+    } else {
+      resetSelection();
+    }
+  }
+);
+
+watch(currentView, (newView) => {
+  emit('view-change', newView === 'products'); // Отправляем true/false
+}, { immediate: true });
+</script>
+<style scoped>
+/* Стили остаются такими же, как в вашем исходном коде */
 .products-wrapp {
   background-color: var(--primary-white-color);
   padding: 15px;
@@ -74,7 +272,6 @@ h4:hover {
   color: var(--primary-orange-dark);
 }
 
-/* Сетка товаров */
 .product-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -82,7 +279,6 @@ h4:hover {
   justify-items: center;
 }
 
-/* Стили карточки товара */
 .card {
   width: 100%;
   max-width: 193px;
@@ -106,7 +302,6 @@ h4:hover {
   height: 140px;
 }
 
-/* Изображение товара */
 .product-image {
   width: 100%;
   height: 100%;
@@ -119,7 +314,6 @@ h4:hover {
   transform: scale(1.03);
 }
 
-/* Кнопка "Купить" */
 .card-buy {
   position: absolute;
   width: 22px;
@@ -155,7 +349,6 @@ h4:hover {
   margin-left: 0;
 }
 
-/* Анимация при наведении */
 .card:hover .card-buy {
   width: 75px;
   padding: 0 8px;
@@ -172,7 +365,6 @@ h4:hover {
   margin-left: 5px;
 }
 
-/* Название товара */
 h5 {
   font-size: 13px;
   font-weight: 600;
@@ -187,7 +379,6 @@ h5 {
   min-height: 48px;
 }
 
-/* Адаптивность */
 @media (min-width: 400px) {
   .product-list {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -281,4 +472,4 @@ h5 {
     width: 90px;
   }
 }
-  </style>
+</style>

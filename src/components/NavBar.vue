@@ -125,7 +125,7 @@ const navigateToCategory = (categoryId) => {
   }
   router.push({ 
     name: 'catalog', 
-    query: { category: categoryId } 
+    query: { parent: categoryId } // Изменяем с 'category' на 'parent'
   });
 };
 </script>

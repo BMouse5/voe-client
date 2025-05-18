@@ -2,45 +2,41 @@
     <div class="product-page">
         <div v-if="loading" class="loading">Загрузка товара...</div>
         <div v-else-if="product" class="product-container">
+            <!-- Уведомление о добавлении в корзину -->
+            <div v-if="showNotification" class="notification">
+                Товар добавлен в корзину!
+            </div>
+            
             <!-- Блок с фото товара -->
             <div class="product-gallery">
                 <div class="main-image">
                     <img :src="getImage(product.image_url)" :alt="product.name" class="product-image">
                 </div>
-                <!-- Здесь можно добавить миниатюры, если есть дополнительные фото -->
             </div>
             
             <!-- Блок с информацией о товаре -->
             <div class="product-info">
                 <h1 class="product-title">{{ product.name }}</h1>
                 
-                <!-- Блок цены -->
                 <div class="price-block" v-if="product.price">
                     <span class="current-price">{{ product.price }} ₽</span>
                     <span class="old-price" v-if="product.old_price">{{ product.old_price }} ₽</span>
                 </div>
                 
-                <!-- Описание товара -->
                 <div class="description-block">
                     <h3>Описание</h3>
                     <p class="product-description">{{ product.description }}</p>
                 </div>
                 
-                <!-- Кнопки действий -->
                 <div class="action-buttons">
                     <ButtonComp @click="handleConsultationClick">Заказать</ButtonComp>
-                </div>
-                
-                <!-- Дополнительная информация -->
-                <div class="additional-info">
-                    <div class="info-item">
-                        <img src="../../../src/assets/img/position.svg" alt="Доставка">
-                        <span>Бесплатная доставка от ###руб.</span>
-                    </div>
-                    <div class="info-item">
-                        <img src="../../../src/assets/img/assoriment.png" alt="Возврат">
-                        <span>Возврат в течение ## дней</span>
-                    </div>
+                    <ButtonComp 
+                        variant="transparent" 
+                        @click="toggleCart"
+                        :class="{ 'in-cart': isInCart }"
+                    >
+                        {{ isInCart ? 'Удалить из корзины' : 'В корзину' }}
+                    </ButtonComp>
                 </div>
             </div>
         </div>
@@ -53,19 +49,28 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { fetchProductById } from '../../../src/services/api.service'
+import { useCartStore } from '../../../src/store/cartStore';
 import ButtonComp from '../../../src/components/UI/ButtonComp.vue'
 
 const route = useRoute();
 const product = ref(null);
 const loading = ref(true);
+const cartStore = useCartStore();
+const showNotification = ref(false);
 const emit = defineEmits(['scroll-to-consultation']);
 
+// Проверяем, есть ли товар в корзине
+const isInCart = computed(() => {
+    return product.value ? cartStore.items.some(item => item.id === product.value.id) : false;
+});
+
 const handleConsultationClick = () => {
-  emit('scroll-to-consultation');
+    emit('scroll-to-consultation');
 };
+
 const getImage = (imageUrl) => {
     return `http://localhost:3000${imageUrl}`;
 };
@@ -79,6 +84,20 @@ const fetchProduct = async () => {
         product.value = null;
     } finally {
         loading.value = false;
+    }
+};
+
+const toggleCart = () => {
+    if (!product.value) return;
+    
+    if (isInCart.value) {
+        cartStore.removeFromCart(product.value.id);
+    } else {
+        cartStore.addToCart(product.value);
+        showNotification.value = true;
+        setTimeout(() => {
+            showNotification.value = false;
+        }, 3000);
     }
 };
 
@@ -200,6 +219,15 @@ onMounted(() => {
     gap: 15px;
     margin: 30px 0;
 }
+
+.action-buttons button:nth-child(2) {
+    color: #333;
+}
+
+.action-buttons button:nth-child(2):hover {
+    color: #ffffff;
+}
+
 .buy-button {
     flex: 1;
     padding: 15px;
@@ -263,4 +291,27 @@ onMounted(() => {
         padding: 15px;
     }
 }
+
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: var(--primary-orange-color);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 5px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    animation: fadeInOut 3s ease-in-out;
+    z-index: 10000;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-20px); }
+    10% { opacity: 1; transform: translateY(0); }
+    90% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-20px); }
+}
+
 </style>

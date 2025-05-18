@@ -72,8 +72,8 @@ const props = defineProps({
 
 // === Preload первого изображения (ускоряем LCP) ===
 onMounted(() => {
-  if (props.products.length > 0) {
-    const preloadImage = `http://localhost:3000${props.products[0].image_url}`;
+  if (parentCategories.value.length > 0) {
+    const preloadImage = `http://localhost:3000${parentCategories.value[0].image_url}`;
     const link = document.createElement('link');
     link.rel = 'preload';
     link.as = 'image';
@@ -88,12 +88,16 @@ const getImage = (imageUrl) => {
 };
 
 const slides = computed(() => {
-  return props.products.map(product => ({
-    title: product.name,
-    description: product.description,
-    image: getImage(product.image_url),
-    categoryId: product.category_id // предполагая, что product содержит category_id
+  return parentCategories.value.map(category => ({
+    title: category.name,
+    description: category.description || "Описание категории отсутствует", // Описание, если доступно
+    image: getImage(category.image_url), // Предполагается, что у категории есть image_url
+    categoryId: category.id,
   }));
+});
+
+const parentCategories = computed(() => {
+  return props.categories.filter(category => !category.parent_id);
 });
 
 // Функция для навигации в каталог

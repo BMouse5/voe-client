@@ -1,442 +1,444 @@
 <template>
-    <div class="admin-categories">
-      <div class="header">
-        <h2>Управление категориями</h2>
-        <button @click="openCreateModal" class="add-btn">
-          Создать категорию
-        </button>
-      </div>
-  
-      <div v-if="loading" class="loading">Загрузка категорий...</div>
-      <div v-else-if="error" class="error-message">{{ error }}</div>
-  
-      <table v-else class="categories-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Название</th>
-            <th>Родительская категория</th>
-            <th>Действия</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="category in categories" :key="category.id">
-            <td>{{ category.id }}</td>
-            <td>{{ category.name }}</td>
-            <td>{{ getParentName(category.parent_id) }}</td>
-            <td class="actions">
-              <button @click="openEditModal(category)" class="edit-btn">
-                Редактировать
-              </button>
-              <button 
-                @click="confirmDelete(category)" 
-                class="delete-btn"
-                :disabled="deleteLoading[category.id]"
-              >
-                {{ deleteLoading[category.id] ? 'Удаление...' : 'Удалить' }}
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-  
-      <!-- Модальное окно создания/редактирования -->
-      <div v-if="showModal" class="modal-overlay">
-        <div class="modal">
-          <h3>{{ editingCategory ? 'Редактирование категории' : 'Создание категории' }}</h3>
-          
-          <form @submit.prevent="handleSubmit">
-            <div class="form-group">
-              <label>Название:</label>
-              <input v-model="form.name" required />
-            </div>
-            
-            <div class="form-group">
-              <label>Описание:</label>
-              <textarea v-model="form.description"></textarea>
-            </div>
-            
-            <div class="form-group">
-              <label>Родительская категория:</label>
-              <select v-model="form.parent_id">
-                <option :value="null">Без родительской категории</option>
-                <option 
-                  v-for="cat in availableParentCategories" 
-                  :key="cat.id" 
-                  :value="cat.id"
-                >
-                  {{ cat.name }}
-                </option>
-              </select>
-            </div>
-            
-            <div class="form-actions">
-              <button type="submit" :disabled="processing" class="confirm-btn">
-                {{ processing ? 'Сохранение...' : 'Сохранить' }}
-              </button>
-              <button type="button" @click="closeModal" class="cancel-btn">
-                Отмена
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-  
-      <!-- Модальное окно подтверждения удаления -->
-      <div v-if="showDeleteModal" class="modal-overlay">
-        <div class="modal">
-          <h3>Подтверждение удаления</h3>
-          <p>Вы уверены, что хотите удалить категорию "{{ selectedCategory?.name }}"?</p>
-          <p v-if="hasChildCategories" class="warning">
-            Внимание: Будут также удалены все подкатегории!
-          </p>
-          
-          <div class="form-actions">
-            <button @click="handleDeleteCategory" class="confirm-btn" :disabled="processing">
-              Удалить
+  <div class="admin-categories">
+    <div class="header">
+      <h2>Управление категориями</h2>
+      <router-link to="/admin/categories/new" class="add-btn">
+        Создать категорию
+      </router-link>
+    </div>
+
+    <div v-if="loading" class="loading">Загрузка категорий...</div>
+
+    <table v-else class="categories-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Изображение</th>
+          <th>Название</th>
+          <th>Родительская категория</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="category in categories" :key="category.id">
+          <td>{{ category.id }}</td>
+          <td class="image-cell">
+            <img 
+              v-if="category.image_url" 
+              :src="getImageUrl(category.image_url)" 
+              :alt="category.name"
+              class="category-image"
+            />
+            <span v-else>Нет изображения</span>
+          </td>
+          <td>{{ category.name }}</td>
+          <td>{{ getParentName(category.parent_id) }}</td>
+          <td class="actions">
+            <router-link 
+              :to="`/admin/categories/edit/${category.id}`" 
+              class="edit-btn"
+            >
+              Редактировать
+            </router-link>
+            <button 
+              @click="confirmDelete(category)" 
+              class="delete-btn"
+              :disabled="deleteLoading[category.id]"
+            >
+              {{ deleteLoading[category.id] ? 'Удаление...' : 'Удалить' }}
             </button>
-            <button @click="closeDeleteModal" class="cancel-btn">
-              Отмена
-            </button>
-          </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Модальное окно для подтверждения удаления -->
+    <div v-if="showDeleteModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>Подтверждение удаления</h3>
+        <p>{{ deleteMessage }}</p>
+        
+        <div class="modal-actions">
+          <button 
+            v-if="canDelete" 
+            @click="proceedWithDelete" 
+            class="confirm-btn"
+          >
+            Удалить
+          </button>
+          <button @click="cancelDelete" class="cancel-btn">
+            {{ canDelete ? 'Отмена' : 'Закрыть' }}
+          </button>
         </div>
       </div>
     </div>
-  </template>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import { 
+  fetchCategories, 
+  deleteCategory, 
+  fetchCategoryProductsCount,
+  fetchChildCategories
+} from '../../src/services/api.service';
+
+const categories = ref([]);
+const loading = ref(true);
+const deleteLoading = ref({});
+
+// Переменные для модального окна
+const showDeleteModal = ref(false);
+const deleteMessage = ref('');
+const categoryToDelete = ref(null);
+const canDelete = ref(false);
+const isCategoryDeleted = ref(false); // Флаг для отслеживания удаления
+
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return '';
+  if (imagePath.startsWith('http')) return imagePath;
+  return `http://localhost:3000${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+};
+
+const getParentName = (parentId) => {
+  if (!parentId) return '-';
+  const parent = categories.value.find(c => c.id === parentId);
+  return parent ? parent.name : 'Неизвестно';
+};
+
+const loadCategories = async () => {
+  try {
+    loading.value = true;
+    categories.value = await fetchCategories();
+  } catch (err) {
+    console.error('Ошибка загрузки категорий:', err);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const confirmDelete = async (category) => {
+  // Проверяем, не была ли категория уже удалена
+  categoryToDelete.value = category;
   
-  <script setup>
-  import { ref, computed, onMounted } from 'vue';
-  import { 
-    fetchCategories, 
-    createCategory, 
-    updateCategory, 
-    deleteCategory,
-    fetchChildCategories
-  } from '../../src/services/api.service';
+  // Проверяем, является ли категория родительской
+  const subcategories = await fetchChildCategories(category.id);
+  const hasSubcategories = subcategories.length > 0;
   
-  const categories = ref([]);
-  const loading = ref(true);
-  const error = ref('');
-  const showModal = ref(false);
-  const showDeleteModal = ref(false);
-  const editingCategory = ref(null);
-  const selectedCategory = ref(null);
-  const processing = ref(false);
-  const deleteLoading = ref({});
-  const childCategories = ref([]);
+  let hasProducts = false;
+  let totalProducts = 0;
   
-  const form = ref({
-    name: '',
-    description: '',
-    parent_id: null
-  });
-  
-  // Доступные родительские категории (исключая текущую и ее подкатегории)
-  const availableParentCategories = computed(() => {
-    return categories.value.filter(cat => 
-      !editingCategory.value || cat.id !== editingCategory.value.id
-    );
-  });
-  
-  // Есть ли дочерние категории
-  const hasChildCategories = computed(() => {
-    return childCategories.value.length > 0;
-  });
-  
-  // Получение имени родительской категории
-  const getParentName = (parentId) => {
-    if (!parentId) return '-';
-    const parent = categories.value.find(c => c.id === parentId);
-    return parent ? parent.name : 'Неизвестно';
-  };
-  
-  // Загрузка категорий
-  const loadCategories = async () => {
-    try {
-      loading.value = true;
-      categories.value = await fetchCategories();
-      error.value = '';
-    } catch (err) {
-      error.value = 'Не удалось загрузить категории';
-      console.error(err);
-    } finally {
-      loading.value = false;
-    }
-  };
-  
-  // Открытие модального окна создания
-  const openCreateModal = () => {
-    editingCategory.value = null;
-    form.value = { name: '', description: '', parent_id: null };
-    showModal.value = true;
-  };
-  
-  // Открытие модального окна редактирования
-  const openEditModal = (category) => {
-    editingCategory.value = category;
-    form.value = { 
-      name: category.name, 
-      description: category.description, 
-      parent_id: category.parent_id 
-    };
-    showModal.value = true;
-  };
-  
-  // Закрытие модального окна
-  const closeModal = () => {
-    showModal.value = false;
-    editingCategory.value = null;
-  };
-  
-  // Подтверждение удаления
-  const confirmDelete = async (category) => {
-    selectedCategory.value = category;
-    try {
-      childCategories.value = await fetchChildCategories(category.id);
-      showDeleteModal.value = true;
-    } catch (err) {
-      error.value = 'Не удалось проверить подкатегории';
-      console.error(err);
-    }
-  };
-  
-  // Закрытие модального окна удаления
-  const closeDeleteModal = () => {
-    showDeleteModal.value = false;
-    selectedCategory.value = null;
-    childCategories.value = [];
-  };
-  
-  // Обработка формы
-  const handleSubmit = async () => {
-    try {
-      processing.value = true;
-      
-      if (editingCategory.value) {
-        // Редактирование
-        const updatedCategory = await updateCategory(editingCategory.value.id, form.value);
-        const index = categories.value.findIndex(c => c.id === updatedCategory.id);
-        if (index !== -1) {
-          categories.value.splice(index, 1, updatedCategory);
-        }
-      } else {
-        // Создание
-        const newCategory = await createCategory(form.value);
-        categories.value.push(newCategory);
+  try {
+    // Проверяем товары в самой категории
+    const mainCategoryProducts = await fetchCategoryProductsCount(category.id);
+    totalProducts += mainCategoryProducts;
+    if (mainCategoryProducts > 0) hasProducts = true;
+    
+    // Проверяем товары в подкатегориях (если есть)
+    if (hasSubcategories) {
+      for (const subcat of subcategories) {
+        const subcatProducts = await fetchCategoryProductsCount(subcat.id);
+        totalProducts += subcatProducts;
+        if (subcatProducts > 0) hasProducts = true;
       }
-      
-      closeModal();
-    } catch (err) {
-      error.value = err.message || 'Ошибка при сохранении категории';
-      console.error(err);
-    } finally {
-      processing.value = false;
     }
-  };
-  
-  // Удаление категории
-  const handleDeleteCategory  = async () => {
-    try {
-      processing.value = true;
-      deleteLoading.value[selectedCategory.value.id] = true;
-      
-      await deleteCategory(selectedCategory.value.id);
-      categories.value = categories.value.filter(
-        c => c.id !== selectedCategory.value.id && c.parent_id !== selectedCategory.value.id
-      );
-      
-      closeDeleteModal();
-    } catch (err) {
-      error.value = err.message || 'Ошибка при удалении категории';
-      console.error(err);
-    } finally {
-      processing.value = false;
-      deleteLoading.value[selectedCategory.value.id] = false;
-    }
-  };
-  
-  // Загрузка данных при монтировании
-  onMounted(loadCategories);
-  </script>
-  
-  <style scoped>
-  .admin-categories {
-    padding: 1rem;
-    max-width: 1200px;
-    margin: 0 auto;
+  } catch (err) {
+    console.error('Ошибка проверки товаров:', err);
+    return;
   }
   
-  .header {
+  if (hasProducts) {
+    deleteMessage.value = `Эта категория содержит товары (${totalProducts} шт.). Удаление невозможно.`;
+    canDelete.value = false;
+  } else if (hasSubcategories) {
+    deleteMessage.value = `Эта категория содержит подкатегории (${subcategories.length} шт.). Все подкатегории также будут удалены. Продолжить?`;
+    canDelete.value = true;
+  } else {
+    deleteMessage.value = `Вы уверены, что хотите удалить категорию "${category.name}"?`;
+    canDelete.value = true;
+  }
+  
+  showDeleteModal.value = true;
+};
+
+const proceedWithDelete = async () => {
+  if (!canDelete.value || !categoryToDelete.value) {
+    showDeleteModal.value = false;
+    return;
+  }
+
+  try {
+    deleteLoading.value[categoryToDelete.value.id] = true;
+    await deleteCategory(categoryToDelete.value.id);
+    isCategoryDeleted.value = true; // Устанавливаем флаг удаления
+    await loadCategories(); // Перезагружаем список категорий
+    showDeleteModal.value = false; // Закрываем попап после успешного удаления
+  } catch (err) {
+    console.error('Ошибка удаления категории:', err);
+    deleteMessage.value = 'Не удалось удалить категорию. Так как в ней есть товары';
+    canDelete.value = false;
+  } finally {
+    deleteLoading.value[categoryToDelete.value.id] = false;
+  }
+};
+
+const cancelDelete = () => {
+  showDeleteModal.value = false;
+  categoryToDelete.value = null;
+  isCategoryDeleted.value = false;
+//  loadCategories();
+};
+
+onMounted(loadCategories);
+</script>
+
+<style scoped>
+/* Стили аналогичные стилям из admin-products */
+.admin-categories {
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.add-btn {
+  background-color: var(--primary-orange-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.add-btn:hover {
+  background-color: var(--primary-dark-orange);
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+}
+
+.error-message {
+  color: #f44336;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.categories-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  table-layout: fixed;
+}
+
+.categories-table th, 
+.categories-table td {
+  padding: 0.75rem;
+  text-align: left;
+  vertical-align: middle;
+  word-wrap: break-word;
+}
+
+.categories-table td {
+  height: 85px;
+}
+
+.categories-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+
+/* Ширины колонок */
+.categories-table th:nth-child(1),
+.categories-table td:nth-child(1) {
+  width: 60px; /* ID */
+}
+
+.categories-table th:nth-child(2),
+.categories-table td:nth-child(2) {
+  width: 120px; /* Изображение */
+}
+
+.categories-table th:nth-child(3),
+.categories-table td:nth-child(3) {
+  width: 200px; /* Название */
+}
+
+.categories-table th:nth-child(4),
+.categories-table td:nth-child(4) {
+  width: 150px; /* Родительская категория */
+}
+
+.categories-table th:nth-child(5),
+.categories-table td:nth-child(5) {
+  width: 180px; /* Действия */
+}
+
+.categories-table tr {
+  border-bottom: 1px solid #ddd;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.edit-btn {
+  background-color: #2196F3;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+}
+
+.delete-btn {
+  background-color: #f44336;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+}
+
+.delete-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.edit-btn:hover, .delete-btn:hover {
+  opacity: 0.9;
+}
+
+.category-image {
+  max-width: 100px;
+  max-height: 60px;
+  width: auto;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.modal-content p {
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.confirm-btn {
+  background-color: #f44336;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background-color: #e0e0e0;
+  color: #333;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.confirm-btn:hover {
+  background-color: #d32f2f;
+}
+
+.cancel-btn:hover {
+  background-color: #bdbdbd;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .categories-table {
+    display: block;
+  }
+  
+  .categories-table thead {
+    display: none;
+  }
+  
+  .categories-table tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+  }
+  
+  .categories-table td {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    width: 100% !important;
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+    border-bottom: 1px solid #eee;
   }
   
-  .add-btn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .add-btn:hover {
-    background-color: #45a049;
-  }
-  
-  .loading {
-    text-align: center;
-    padding: 2rem;
-    color: #666;
-  }
-  
-  .error-message {
-    color: #f44336;
-    text-align: center;
-    padding: 1rem;
-    background-color: #ffeeee;
-    border-radius: 4px;
-    margin: 1rem 0;
-  }
-  
-  .categories-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .categories-table th, 
-  .categories-table td {
-    padding: 0.75rem;
+  .categories-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 45%;
+    padding-left: 1rem;
+    font-weight: bold;
     text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .categories-table th {
-    background-color: #f5f5f5;
-    font-weight: 600;
   }
   
   .actions {
-    display: flex;
-    gap: 0.5rem;
-  }
-  
-  .edit-btn {
-    background-color: #2196F3;
-    color: white;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.875rem;
-  }
-  
-  .delete-btn {
-    background-color: #f44336;
-    color: white;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.875rem;
-  }
-  
-  .delete-btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
-  
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .modal {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-  
-  .modal h3 {
-    margin-top: 0;
-    margin-bottom: 1.5rem;
-    color: #333;
-  }
-  
-  .form-group {
-    margin-bottom: 1rem;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-  }
-  
-  .form-group input,
-  .form-group textarea,
-  .form-group select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-  }
-  
-  .form-group textarea {
-    min-height: 100px;
-    resize: vertical;
-  }
-  
-  .form-actions {
-    display: flex;
     justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 1.5rem;
   }
-  
-  .confirm-btn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .confirm-btn:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-  }
-  
-  .cancel-btn {
-    background-color: #f5f5f5;
-    color: #333;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .warning {
-    color: #ff9800;
-    font-weight: 500;
-    margin: 0.5rem 0;
-  }
-  </style>
+}
+</style>

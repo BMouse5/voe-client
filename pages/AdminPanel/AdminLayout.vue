@@ -9,6 +9,7 @@
         <router-link to="/admin/dashboard">Главная</router-link>
         <router-link to="/admin/products">Товары</router-link>
         <router-link to="/admin/categories">Категории</router-link>
+        <router-link to="/admin/consultations">Заявки</router-link>
       </nav>
     </header>
     <main class="admin-main">
@@ -44,7 +45,7 @@ const handleLogout = async () => {
 }
 
 .admin-header {
-  background-color: #2c3e50;
+  background-color: var(--primary-asphalt-gray);
   color: white;
   padding: 1rem;
 }
@@ -72,11 +73,12 @@ const handleLogout = async () => {
 }
 
 .admin-nav {
-  background-color: #34495e;
+  background-color: var(--primary-asphalt-gray);
   padding: 0.5rem 1rem;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+  margin-top: 10px;
 }
 
 .admin-nav a {
@@ -86,14 +88,17 @@ const handleLogout = async () => {
   padding: 0.5rem;
   border-radius: 4px;
   transition: background-color 0.3s;
+  text-decoration: underline var(--primary-orange-color);
 }
 
 .admin-nav a:hover {
-  background-color: #3d566e;
+  background-color: var(--primary-dark-orange);
+  text-decoration: none;
 }
 
 .admin-nav a.router-link-exact-active {
-  background-color: #4CAF50;
+  background-color: var(--primary-orange-color);
+  text-decoration: none;
 }
 
 .admin-main {

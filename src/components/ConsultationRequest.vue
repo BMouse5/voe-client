@@ -57,7 +57,7 @@
               </ButtonComp>
             </form>
           </div>
-          <span class="consent-text">Оставляя заявку вы соглашаетесь с политикой обработки <a href="/">персональных данных</a></span>
+          <span class="consent-text">Оставляя заявку вы соглашаетесь с политикой обработки <router-link to="/privacy-policy">персональных данных</router-link></span>
         </div>
       </div>
     </div>

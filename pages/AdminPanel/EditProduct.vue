@@ -26,19 +26,19 @@
         <div class="form-group">
           <label for="category">Категория</label>
           <select
-            id="category"
-            v-model="form.category_id"
-            required
+          id="category"
+          v-model="form.category_id"
+          required
+        >
+          <option value="">Выберите категорию</option>
+          <option 
+            v-for="category in subcategories" 
+            :key="category.id" 
+            :value="category.id"
           >
-            <option value="">Выберите категорию</option>
-            <option 
-              v-for="category in categories" 
-              :key="category.id" 
-              :value="category.id"
-            >
-              {{ category.name }}
-            </option>
-          </select>
+            {{ category.name }}
+          </option>
+        </select>
         </div>
       </div>
       
@@ -73,7 +73,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { fetchProductById, fetchCategories, updateProduct, createProduct } from '../../src/services/api.service';
 
@@ -175,6 +175,11 @@ const handleSubmit = async () => {
     loading.value = false;
   }
 };
+
+const subcategories = computed(() => {
+  // Фильтруем категории, оставляя только те, у которых parent_id не равен null
+  return categories.value.filter(category => category.parent_id !== null);
+});
 </script>
 
 <style scoped>
@@ -241,7 +246,7 @@ const handleSubmit = async () => {
 }
 
 .form-actions button {
-  background-color: #4CAF50;
+  background-color: var(--primary-orange-color);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -252,7 +257,7 @@ const handleSubmit = async () => {
 }
 
 .form-actions button:hover {
-  background-color: #45a049;
+  background-color: var(--primary-dark-orange);
 }
 
 .form-actions button:disabled {
@@ -278,4 +283,15 @@ const handleSubmit = async () => {
   color: #f44336;
   margin-top: 1rem;
 }
+
+.remove-btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+  }
 </style>
