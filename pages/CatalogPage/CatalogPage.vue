@@ -77,30 +77,32 @@ watch(
 );
 
 const filteredProducts = computed(() => {
-  let productsByCategory = props.products;
-
+  // Начинаем со всех товаров или отфильтрованных по категории
+  let filtered = props.products;
+  
+  // 1. Сначала фильтруем по категории (если выбрана)
   if (selectedCategoryId.value) {
-    const childCategories = props.categories
+    const childCategoryIds = props.categories
       .filter(cat => cat.parent_id === selectedCategoryId.value)
       .map(cat => cat.id);
-
-    const categoriesToFilter = [selectedCategoryId.value, ...childCategories];
-    productsByCategory = props.products.filter(
-      product => categoriesToFilter.includes(product.category_id)
+    
+    const categoriesToFilter = [selectedCategoryId.value, ...childCategoryIds];
+    filtered = filtered.filter(product => 
+      categoriesToFilter.includes(product.category_id)
     );
   }
-
+  
+  // 2. Затем фильтруем по первой букве (если есть запрос)
   if (searchQuery.value.trim()) {
-    const query = searchQuery.value.trim().toLowerCase();
-    productsByCategory = productsByCategory.filter(product =>
-      product.name.toLowerCase().includes(query)
-    );
+    const firstLetter = searchQuery.value.trim().toLowerCase()[0];
+    filtered = filtered.filter(product => {
+      const productName = product.name?.toLowerCase() || '';
+      return productName.startsWith(firstLetter);
+    });
   }
-
-  console.log("Filtered Products:", productsByCategory); // Проверка результата
-  return productsByCategory;
+  
+  return filtered;
 });
-
 
 watch(searchQuery, () => {
   console.log("Search query changed:", searchQuery.value);

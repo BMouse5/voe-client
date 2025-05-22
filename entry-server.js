@@ -32,7 +32,7 @@ export async function render(url, manifest) {
       : null
 
     // Создаем приложение с этими данными
-    const { app, router } = await createApp(url, { products, categories })
+    const { app, router, pinia } = await createApp(url, { products, categories })
 
     const ctx = {}
     const appHtml = await renderToString(app, ctx)

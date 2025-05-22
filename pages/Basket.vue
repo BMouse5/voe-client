@@ -39,7 +39,7 @@
         </div>
       </div>
     </div>
-    <ConsultationRequest ref="consultationRef">Оставьте заявку, чтобы обсудить дальнейшие детали</ConsultationRequest>
+    <ConsultationRequest ref="consultationRef" :is-from-cart="true">Оставьте заявку, чтобы обсудить дальнейшие детали</ConsultationRequest>
     </div>
     <FooterComp />
   </div>

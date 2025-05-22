@@ -2,9 +2,16 @@ import { defineStore } from 'pinia';
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
-    items: JSON.parse(localStorage.getItem('cart')) || [],
+    items: [],
   }),
   actions: {
+    init() {
+      // Загружаем из localStorage только если window доступен (клиент)
+      if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('cart')
+        this.items = saved ? JSON.parse(saved) : []
+      }
+    },
     addToCart(product) {
       const existingItem = this.items.find(item => item.id === product.id);
       if (existingItem) {

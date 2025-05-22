@@ -67,7 +67,15 @@
 <script setup>
 import ButtonComp from '../components/UI/ButtonComp.vue'
 import { ref } from 'vue'
+import { useCartStore } from '../store/cartStore'
 import axios from 'axios'
+
+const props = defineProps({
+  isFromCart: {
+    type: Boolean,
+    default: false
+  }
+})
 
 const form = ref({
   name: '',
@@ -80,6 +88,7 @@ const isLoading = ref(false)
 const showToast = ref(false)
 const toastMessage = ref('')
 const toastSuccess = ref(false)
+const cartStore = useCartStore()
 
 const showNotification = (message, success) => {
   toastMessage.value = message
@@ -93,11 +102,16 @@ const showNotification = (message, success) => {
 const submitForm = async () => {
   try {
     isLoading.value = true
-    
+
+    const formData = {
+      ...form.value,
+      cartItems: props.isFromCart ? cartStore.items : [] // добавляем товары из корзины
+    };
+
     const response = await axios.post(
       'http://localhost:3000/api/consultations',
-      form.value
-    )
+      formData
+    );
     
     if(response) {
       form.value = {

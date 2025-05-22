@@ -65,7 +65,7 @@
       </div>
       <div 
         v-else
-        v-for="product in props.products" 
+        v-for="product in products" 
         :key="product.id" 
         class="card" 
         @click="goToProduct(product.id)"
@@ -175,11 +175,16 @@ const selectParent = async (parent) => {
 const selectChild = async (child) => {
   selectedCategory.value = child;
   try {
-    console.log("Filtering products for category:", child.id);
-    console.log("All products:", props.products);
+    // Отладочная информация
+    console.log("All products with categories:", 
+      props.products.map(p => ({id: p.id, name: p.name, category_id: p.category_id})));
+    console.log("Current category ID:", child.id);
     
-    // Фильтруем товары по category_id
-    products.value = props.products.filter(p => p.category_id === child.id);
+    // Вариант 1: Фильтрация с приведением типов
+    products.value = props.products.filter(p => Number(p.category_id) === Number(child.id));
+    
+    // Или Вариант 2: Загрузка из API (предпочтительно)
+    // products.value = await fetchProductsByCategory(child.id);
     
     console.log("Filtered products:", products.value);
     
@@ -248,6 +253,7 @@ watch(
 watch(currentView, (newView) => {
   emit('view-change', newView === 'products'); // Отправляем true/false
 }, { immediate: true });
+
 </script>
 <style scoped>
 /* Стили остаются такими же, как в вашем исходном коде */
@@ -291,6 +297,23 @@ h4:hover {
 
 .card:hover {
   transform: translateY(-3px);
+}
+
+.card h5 {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  margin: 0;
+  padding: 0 3px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Ограничиваем количество строк */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 48px; /* Фиксированная высота */
+  line-height: 1.2; /* Межстрочный интервал */
+  min-height: 48px; /* Минимальная высота на всякий случай */
+  max-height: 48px; /* Максимальная высота */
 }
 
 .card-body {
