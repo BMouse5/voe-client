@@ -137,7 +137,7 @@ const getImageUrl = (imagePath) => {
   }
   
   const cleanPath = imagePath.replace(/^\/+/, '');
-  const fullUrl = `http://127.0.0.1:3000/${cleanPath}`;
+  const fullUrl = `http://62.113.41.108/${cleanPath}`;
   console.log("Generated image URL:", fullUrl);
   return fullUrl;
 };

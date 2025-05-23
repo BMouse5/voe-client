@@ -51,7 +51,7 @@ export default {
     // Загружаем список категорий с API
     async fetchCategories() {
       try {
-        const response = await axios.get('http://127.0.0.1:3000/api/categories');
+        const response = await axios.get('http://62.113.41.108/api/categories');
         this.categories = response.data;  // Заполняем массив категорий
       } catch (error) {
         console.error('Ошибка при получении категорий:', error);
@@ -76,7 +76,7 @@ export default {
       formData.append('image', this.image);
 
       try {
-        await axios.post('http://127.0.0.1:3000/api/products', formData, {
+        await axios.post('http://62.113.41.108/api/products', formData, {
           headers: {
             'Content-Type': 'multipart/form-data' // Указываем тип контента для файлов
           }

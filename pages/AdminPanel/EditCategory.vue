@@ -104,7 +104,7 @@
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '';
     if (imagePath.startsWith('http')) return imagePath;
-    return `http://127.0.0.1:3000${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+    return `http://62.113.41.108${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
   };
   
   onMounted(async () => {
