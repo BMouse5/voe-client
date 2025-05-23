@@ -72,7 +72,7 @@ const handleConsultationClick = () => {
 };
 
 const getImage = (imageUrl) => {
-    return `http://localhost:3000${imageUrl}`;
+    return `http://127.0.0.1:3000${imageUrl}`;
 };
 
 const fetchProduct = async () => {

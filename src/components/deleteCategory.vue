@@ -148,7 +148,7 @@
     methods: {
       async fetchCategories() {
         try {
-          const response = await axios.get('http://localhost:3000/api/categories');
+          const response = await axios.get('http://127.0.0.1:3000/api/categories');
           this.categories = response.data;
         } catch (error) {
           this.showNotification('Ошибка при загрузке категорий', 'error');
@@ -200,7 +200,7 @@
           if (this.editingCategory) {
             // Редактирование существующей категории
             const response = await axios.put(
-              `http://localhost:3000/api/categories/${this.editingCategory.id}`,
+              `http://127.0.0.1:3000/api/categories/${this.editingCategory.id}`,
               this.form
             );
             this.showNotification('Категория успешно обновлена', 'success');
@@ -208,7 +208,7 @@
           } else {
             // Создание новой категории
             const response = await axios.post(
-              'http://localhost:3000/api/categories',
+              'http://127.0.0.1:3000/api/categories',
               this.form
             );
             this.showNotification('Категория успешно создана', 'success');
@@ -241,8 +241,8 @@
       async checkCategoryDependencies(categoryId) {
         try {
           const [childrenResponse, productsResponse] = await Promise.all([
-            axios.get(`http://localhost:3000/api/categories/children/${categoryId}`),
-            axios.get(`http://localhost:3000/api/categories/${categoryId}/products`)
+            axios.get(`http://127.0.0.1:3000/api/categories/children/${categoryId}`),
+            axios.get(`http://127.0.0.1:3000/api/categories/${categoryId}/products`)
           ]);
           this.childCategories = childrenResponse.data;
           this.productCount = productsResponse.data.count;
@@ -254,7 +254,7 @@
       async deleteCategory() {
         this.processing = true;
         try {
-          await axios.delete(`http://localhost:3000/api/categories/${this.selectedCategory.id}`);
+          await axios.delete(`http://127.0.0.1:3000/api/categories/${this.selectedCategory.id}`);
           this.showNotification('Категория успешно удалена', 'success');
           this.categories = this.categories.filter(
             c => c.id !== this.selectedCategory.id && c.parent_id !== this.selectedCategory.id

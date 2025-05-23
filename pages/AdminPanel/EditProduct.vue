@@ -100,7 +100,7 @@ const getImageUrl = (imagePath) => {
   // Если путь уже содержит http (полный URL), возвращаем как есть
   if (imagePath.startsWith('http')) return imagePath;
   // Иначе формируем полный URL
-  return `http://localhost:3000${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+  return `http://127.0.0.1:3000${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
 };
 
 onMounted(async () => {

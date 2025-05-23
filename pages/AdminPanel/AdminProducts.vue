@@ -83,7 +83,7 @@ const deleteProductId = ref(null); // ID удаляемого товара
 const getImageUrl = (imagePath) => {
   if (!imagePath) return '';
   if (imagePath.startsWith('http')) return imagePath;
-  return `http://localhost:3000${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+  return `http://127.0.0.1:3000${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
 };
 
 onMounted(async () => {

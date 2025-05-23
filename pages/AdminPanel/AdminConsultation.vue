@@ -84,7 +84,7 @@
   const fetchConsultations = async () => {
     try {
       loading.value = true;
-      const response = await axios.get('http://localhost:3000/api/consultations');
+      const response = await axios.get('http://127.0.0.1:3000/api/consultations');
       consultations.value = response.data;
     } catch (error) {
       console.error('Ошибка загрузки заявок:', error);
@@ -110,7 +110,7 @@ const updateStatus = async (id, statusId) => {
     );
 
     const response = await axios.patch(
-      `http://localhost:3000/api/consultations/${id}/status`,
+      `http://127.0.0.1:3000/api/consultations/${id}/status`,
       { status_id: statusId },
       {
         headers: {
@@ -153,7 +153,7 @@ const updateStatus = async (id, statusId) => {
     const id = deleteConsultationId.value;
     try {
       deleteLoading.value[id] = true;
-      await axios.delete(`http://localhost:3000/api/consultations/${id}`);
+      await axios.delete(`http://127.0.0.1:3000/api/consultations/${id}`);
       consultations.value.data = consultations.value.data.filter(c => c.id !== id);
     } catch (error) {
       console.error('Ошибка при удалении заявки:', error);

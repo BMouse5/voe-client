@@ -28,7 +28,7 @@ export async function render(url, manifest) {
     ])
 
     const preloadImage = products[0]
-      ? `http://localhost:3000${products[0].image_url}`
+      ? `http://127.0.0.1:3000${products[0].image_url}`
       : null
 
     // Создаем приложение с этими данными

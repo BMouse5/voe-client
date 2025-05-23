@@ -96,7 +96,7 @@ export default {
   methods: {
     async fetchProducts() {
       try {
-        const response = await axios.get('http://localhost:3000/api/products');
+        const response = await axios.get('http://127.0.0.1:3000/api/products');
         this.products = response.data;
       } catch (error) {
         console.error('Ошибка при получении продуктов:', error);
@@ -105,7 +105,7 @@ export default {
 
     async fetchCategories() {
       try {
-        const response = await axios.get('http://localhost:3000/api/categories');
+        const response = await axios.get('http://127.0.0.1:3000/api/categories');
         this.categories = response.data;
       } catch (error) {
         console.error('Ошибка при получении категорий:', error);
@@ -113,7 +113,7 @@ export default {
     },
 
     getImageUrl(imageUrl) {
-      return `http://localhost:3000${imageUrl}`;
+      return `http://127.0.0.1:3000${imageUrl}`;
     },
 
     // Получаем название родительской категории
@@ -125,7 +125,7 @@ export default {
     async deleteProduct(productId) {
       if (confirm('Вы уверены, что хотите удалить этот товар?')) {
         try {
-          await axios.delete(`http://localhost:3000/api/products/${productId}`);
+          await axios.delete(`http://127.0.0.1:3000/api/products/${productId}`);
           this.products = this.products.filter(product => product.id !== productId);
         } catch (error) {
           console.error('Ошибка при удалении товара:', error);
@@ -157,7 +157,7 @@ export default {
 
       try {
         const response = await axios.put(
-          `http://localhost:3000/api/products/${this.editingProduct.id}`,
+          `http://127.0.0.1:3000/api/products/${this.editingProduct.id}`,
           formData,
           {
             headers: {
