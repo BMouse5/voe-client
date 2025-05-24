@@ -73,7 +73,7 @@ const props = defineProps({
 // === Preload первого изображения (ускоряем LCP) ===
 onMounted(() => {
   if (parentCategories.value.length > 0) {
-    const preloadImage = `http://62.113.41.108${parentCategories.value[0].image_url}`;
+    const preloadImage = `http://voenerdgy.ru${parentCategories.value[0].image_url}`;
     const link = document.createElement('link');
     link.rel = 'preload';
     link.as = 'image';
@@ -84,7 +84,7 @@ onMounted(() => {
 
 // === Обработка продуктов ===
 const getImage = (imageUrl) => {
-  return `http://62.113.41.108${imageUrl}`;
+  return `http://voenerdgy.ru${imageUrl}`;
 };
 
 const slides = computed(() => {

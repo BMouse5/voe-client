@@ -117,7 +117,7 @@ const toastSuccess = ref(false)
     try {
       isLoading.value = true
       const response = await axios.post(
-        'http://62.113.41.108/api/consultations',
+        'http://voenerdgy.ru/api/consultations',
          form.value
       );
       if(response) {

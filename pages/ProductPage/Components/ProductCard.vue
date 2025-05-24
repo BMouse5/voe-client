@@ -72,7 +72,7 @@ const handleConsultationClick = () => {
 };
 
 const getImage = (imageUrl) => {
-    return `http://62.113.41.108${imageUrl}`;
+    return `http://voenerdgy.ru${imageUrl}`;
 };
 
 const fetchProduct = async () => {

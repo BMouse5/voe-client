@@ -104,7 +104,7 @@
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '';
     if (imagePath.startsWith('http')) return imagePath;
-    return `http://62.113.41.108${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+    return `http://voenerdgy.ru${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
   };
   
   onMounted(async () => {

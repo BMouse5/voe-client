@@ -109,7 +109,7 @@ const submitForm = async () => {
     };
 
     const response = await axios.post(
-      'http://62.113.41.108/api/consultations',
+      'http://voenerdgy.ru/api/consultations',
       formData
     );
     

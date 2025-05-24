@@ -80,7 +80,7 @@ const dragTime = ref(0)
 const prevPosition = ref(0)
 
 const getImage = (imageUrl) => {
-  return `http://62.113.41.108${imageUrl}`
+  return `http://voenerdgy.ru${imageUrl}`
 }
 
 // Вычисляемые свойства
