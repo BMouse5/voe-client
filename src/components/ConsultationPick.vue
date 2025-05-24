@@ -77,7 +77,7 @@
   
         try {
           const response = await axios.post(
-            'http://voenerdgy.ru/api/consultations',
+            'https://voenerdgy.ru/api/consultations',
             this.form
           );
           

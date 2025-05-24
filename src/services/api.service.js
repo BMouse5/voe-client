@@ -1,7 +1,7 @@
 // api.service.js
 import axios from 'axios';
 
-const API_BASE_URL = 'http://voenerdgy.ru/api';
+const API_BASE_URL = 'https://voenerdgy.ru/api';
 
 
 

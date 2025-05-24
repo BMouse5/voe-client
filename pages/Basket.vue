@@ -56,7 +56,7 @@ const cartStore = useCartStore();
 const consultationRef = ref(null)
 
 const getImage = (imageUrl) => {
-  return `http://voenerdgy.ru${imageUrl}`;
+  return `https://voenerdgy.ru${imageUrl}`;
 };
 
 const removeItem = (productId) => {

@@ -84,7 +84,7 @@
   const fetchConsultations = async () => {
     try {
       loading.value = true;
-      const response = await axios.get('http://voenerdgy.ru/api/consultations');
+      const response = await axios.get('https://voenerdgy.ru/api/consultations');
       consultations.value = response.data;
     } catch (error) {
       console.error('Ошибка загрузки заявок:', error);
@@ -110,7 +110,7 @@ const updateStatus = async (id, statusId) => {
     );
 
     const response = await axios.patch(
-      `http://voenerdgy.ru/api/consultations/${id}/status`,
+      `https://voenerdgy.ru/api/consultations/${id}/status`,
       { status_id: statusId },
       {
         headers: {
@@ -153,7 +153,7 @@ const updateStatus = async (id, statusId) => {
     const id = deleteConsultationId.value;
     try {
       deleteLoading.value[id] = true;
-      await axios.delete(`http://voenerdgy.ru/api/consultations/${id}`);
+      await axios.delete(`https://voenerdgy.ru/api/consultations/${id}`);
       consultations.value.data = consultations.value.data.filter(c => c.id !== id);
     } catch (error) {
       console.error('Ошибка при удалении заявки:', error);

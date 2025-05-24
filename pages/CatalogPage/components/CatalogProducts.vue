@@ -137,7 +137,7 @@ const getImageUrl = (imagePath) => {
   }
   
   const cleanPath = imagePath.replace(/^\/+/, '');
-  const fullUrl = `http://voenerdgy.ru/${cleanPath}`;
+  const fullUrl = `https://voenerdgy.ru/${cleanPath}`;
   console.log("Generated image URL:", fullUrl);
   return fullUrl;
 };

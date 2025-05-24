@@ -96,7 +96,7 @@ export default {
   methods: {
     async fetchProducts() {
       try {
-        const response = await axios.get('http://voenerdgy.ru/api/products');
+        const response = await axios.get('https://voenerdgy.ru/api/products');
         this.products = response.data;
       } catch (error) {
         console.error('Ошибка при получении продуктов:', error);
@@ -105,7 +105,7 @@ export default {
 
     async fetchCategories() {
       try {
-        const response = await axios.get('http://voenerdgy.ru/api/categories');
+        const response = await axios.get('https://voenerdgy.ru/api/categories');
         this.categories = response.data;
       } catch (error) {
         console.error('Ошибка при получении категорий:', error);
@@ -113,7 +113,7 @@ export default {
     },
 
     getImageUrl(imageUrl) {
-      return `http://voenerdgy.ru${imageUrl}`;
+      return `https://voenerdgy.ru${imageUrl}`;
     },
 
     // Получаем название родительской категории
@@ -125,7 +125,7 @@ export default {
     async deleteProduct(productId) {
       if (confirm('Вы уверены, что хотите удалить этот товар?')) {
         try {
-          await axios.delete(`http://voenerdgy.ru/api/products/${productId}`);
+          await axios.delete(`https://voenerdgy.ru/api/products/${productId}`);
           this.products = this.products.filter(product => product.id !== productId);
         } catch (error) {
           console.error('Ошибка при удалении товара:', error);
@@ -157,7 +157,7 @@ export default {
 
       try {
         const response = await axios.put(
-          `http://voenerdgy.ru/api/products/${this.editingProduct.id}`,
+          `https://voenerdgy.ru/api/products/${this.editingProduct.id}`,
           formData,
           {
             headers: {

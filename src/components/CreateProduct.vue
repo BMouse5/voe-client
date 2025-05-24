@@ -51,7 +51,7 @@ export default {
     // Загружаем список категорий с API
     async fetchCategories() {
       try {
-        const response = await axios.get('http://voenerdgy.ru/api/categories');
+        const response = await axios.get('https://voenerdgy.ru/api/categories');
         this.categories = response.data;  // Заполняем массив категорий
       } catch (error) {
         console.error('Ошибка при получении категорий:', error);
@@ -76,7 +76,7 @@ export default {
       formData.append('image', this.image);
 
       try {
-        await axios.post('http://voenerdgy.ru/api/products', formData, {
+        await axios.post('https://voenerdgy.ru/api/products', formData, {
           headers: {
             'Content-Type': 'multipart/form-data' // Указываем тип контента для файлов
           }

@@ -28,7 +28,7 @@ export async function render(url, manifest) {
     ])
 
     const preloadImage = products[0]
-      ? `http://voenerdgy.ru${products[0].image_url}`
+      ? `https://voenerdgy.ru${products[0].image_url}`
       : null
 
     // Создаем приложение с этими данными

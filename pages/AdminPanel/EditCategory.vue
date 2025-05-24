@@ -104,7 +104,7 @@
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '';
     if (imagePath.startsWith('http')) return imagePath;
-    return `http://voenerdgy.ru${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+    return `https://voenerdgy.ru${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
   };
   
   onMounted(async () => {

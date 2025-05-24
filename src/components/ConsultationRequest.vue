@@ -109,7 +109,7 @@ const submitForm = async () => {
     };
 
     const response = await axios.post(
-      'http://voenerdgy.ru/api/consultations',
+      'https://voenerdgy.ru/api/consultations',
       formData
     );
     

@@ -100,7 +100,7 @@ const getImageUrl = (imagePath) => {
   // Если путь уже содержит http (полный URL), возвращаем как есть
   if (imagePath.startsWith('http')) return imagePath;
   // Иначе формируем полный URL
-  return `http://voenerdgy.ru${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+  return `https://voenerdgy.ru${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
 };
 
 onMounted(async () => {

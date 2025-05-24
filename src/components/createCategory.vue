@@ -44,7 +44,7 @@
       // Метод для получения всех категорий с сервера
       async fetchCategories() {
         try {
-          const response = await axios.get('http://voenerdgy.ru/api/categories');
+          const response = await axios.get('https://voenerdgy.ru/api/categories');
           this.categories = response.data;  // Сохраняем категории в state
         } catch (error) {
           console.error('Ошибка при получении категорий:', error);
@@ -54,7 +54,7 @@
       // Метод для создания категории
       async createCategory() {
         try {
-          const response = await axios.post('http://voenerdgy.ru/api/categories', {
+          const response = await axios.post('https://voenerdgy.ru/api/categories', {
             name: this.name,
             description: this.description,
             parent_id: this.parentId || null, // если нет parentId, то это основная категория
